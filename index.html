@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="refresh" content="60" />
+  <title>OpenClaw 사용량 대시보드</title>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b1020;color:#eaf0ff;margin:0;padding:24px}
+    .wrap{max-width:980px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+    .card{background:#121a33;border:1px solid #243056;border-radius:14px;padding:14px}
+    .k{font-size:12px;opacity:.75;margin-bottom:6px}
+    .v{font-size:20px;font-weight:700}
+    h1{font-size:22px;margin:0 0 6px}
+    h2{font-size:16px;margin:18px 0 8px}
+    ul{margin:8px 0 0 18px}
+    code{background:#1a2447;padding:2px 6px;border-radius:6px}
+    .ok{color:#73f5a4}.warn{color:#ffd166}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📊 OpenClaw 토큰/API 사용량</h1>
+    <div style="opacity:.8;margin-bottom:12px">마지막 갱신: 2026-02-18 16:24 (Asia/Seoul)</div>
+
+    <div class="grid">
+      <div class="card"><div class="k">모델</div><div class="v">gpt-5.3-codex</div></div>
+      <div class="card"><div class="k">입력 토큰</div><div class="v">19k</div></div>
+      <div class="card"><div class="k">출력 토큰</div><div class="v">227</div></div>
+      <div class="card"><div class="k">컨텍스트 사용</div><div class="v">25k / 272k <span class="ok">(9%)</span></div></div>
+      <div class="card"><div class="k">세션</div><div class="v" style="font-size:15px">agent:main:main</div></div>
+      <div class="card"><div class="k">Reasoning</div><div class="v">off</div></div>
+    </div>
+
+    <h2>자동 리포트 스케줄</h2>
+    <div class="card">
+      <ul>
+        <li><b>매일 09:10 / 21:10</b> — 일일 토큰/API 사용량 요약</li>
+        <li><b>매주 월요일 09:15</b> — 주간 사용량/효율 리포트</li>
+      </ul>
+    </div>
+
+    <h2>빠른 확인 방법</h2>
+    <div class="card">
+      텔레그램에서 나에게 <code>/status</code> 또는 “사용량 보여줘”라고 말하면 최신 수치로 바로 갱신해서 알려줄게.
+    </div>
+
+    <h2>참고</h2>
+    <div class="card warn">
+      이 HTML은 현재 스냅샷 뷰야. 실시간 자동 갱신형 웹앱이 필요하면 다음 단계로 로컬 API 연동 버전 만들어줄 수 있어.
+    </div>
+  </div>
+</body>
+</html>
