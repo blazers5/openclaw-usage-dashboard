@@ -255,6 +255,14 @@ function normalizeDateInput(v){
     const y=only.slice(0,4), m=only.slice(4,6), d=only.slice(6,8);
     return `${y}-${m}-${d}`;
   }
+  // yymmdd 입력 허용 (예: 260219 -> 2026-02-19)
+  if(only.length === 6){
+    const yy = Number(only.slice(0,2));
+    const y = String(2000 + yy);
+    const m = only.slice(2,4);
+    const d = only.slice(4,6);
+    return `${y}-${m}-${d}`;
+  }
   const m = raw.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/);
   if(m){
     const y=m[1], mo=m[2].padStart(2,'0'), da=m[3].padStart(2,'0');
@@ -275,7 +283,7 @@ async function saveRow(e){
   if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
   if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
   if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
-  if(expiry === null){ alert('유효기간 형식은 YYYY-MM-DD 또는 YYYYMMDD로 입력해주세요.'); return; }
+  if(expiry === null){ alert('유효기간 형식은 YYYY-MM-DD / YYYYMMDD / YYMMDD 로 입력해주세요.'); return; }
 
   const payload = { no, name, code, expiry_date: expiry || null };
   const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
