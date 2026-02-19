@@ -36,7 +36,7 @@
     }
 
     @media (max-width: 900px){
-      .top{display:grid;grid-template-columns:1fr auto auto;gap:6px}
+      .top{display:grid;grid-template-columns:1fr auto;gap:6px}
       #q{grid-column:1 / -1}
       .table-wrap{overflow-x:hidden}
       table{width:100%;min-width:0;border:1px solid #e7ebf3;background:#fff;table-layout:fixed}
@@ -48,12 +48,12 @@
       /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
       th:nth-child(1), td:nth-child(1){width:30px;padding-right:2px}
       th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
-      th:nth-child(3), td:nth-child(3){width:108px; text-align:right; white-space:nowrap}
-      th:nth-child(4), td:nth-child(4){width:66px}
+      th:nth-child(3), td:nth-child(3){width:118px; text-align:right; white-space:nowrap}
+      th:nth-child(4), td:nth-child(4){width:92px; padding-right:2px}
       td[data-label]::before{content:none}
       .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
-      .save-wrap{justify-content:flex-start;gap:4px}
-      .save-btn{min-width:50px;padding:6px 7px;font-size:11px}
+      .save-wrap{justify-content:flex-start;gap:4px;flex-wrap:nowrap}
+      .save-btn{min-width:40px;padding:6px 6px;font-size:11px}
       .footer{font-size:11px}
     }
 
@@ -157,7 +157,7 @@ function rowView(r){
         <input class="cell-input" data-field="name" value="${esc(r.name)}" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
-      <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
+      <td data-label="유효기간"><input class="cell-input" type="text" inputmode="numeric" data-field="expiry_date" placeholder="YYYY-MM-DD" value="${esc(r.expiry_date || '')}" /></td>
       <td data-label="저장">
         <div class="save-wrap">
           <button class="save-btn" data-action="save">저장</button>
@@ -247,17 +247,35 @@ async function addRow(){
   render();
 }
 
+function normalizeDateInput(v){
+  const raw = nfc(v);
+  if(!raw) return '';
+  const only = raw.replace(/[^0-9]/g,'');
+  if(only.length === 8){
+    const y=only.slice(0,4), m=only.slice(4,6), d=only.slice(6,8);
+    return `${y}-${m}-${d}`;
+  }
+  const m = raw.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/);
+  if(m){
+    const y=m[1], mo=m[2].padStart(2,'0'), da=m[3].padStart(2,'0');
+    return `${y}-${mo}-${da}`;
+  }
+  return null;
+}
+
 async function saveRow(e){
   const tr = e.target.closest('tr');
   const id = tr.dataset.id;
   const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
   const name = nfc(tr.querySelector('[data-field="name"]').value);
   const code = nfc(tr.querySelector('[data-field="code"]').value);
-  const expiry = nfc(tr.querySelector('[data-field="expiry_date"]').value);
+  const expiryRaw = tr.querySelector('[data-field="expiry_date"]').value;
+  const expiry = normalizeDateInput(expiryRaw);
 
   if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
   if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
   if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+  if(expiry === null){ alert('유효기간 형식은 YYYY-MM-DD 또는 YYYYMMDD로 입력해주세요.'); return; }
 
   const payload = { no, name, code, expiry_date: expiry || null };
   const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
