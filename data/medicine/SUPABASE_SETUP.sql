@@ -35,3 +35,11 @@ on public.medicine_inventory
 for insert
 to anon, authenticated
 with check (true);
+
+-- 5) 익명 delete 허용(행 삭제/전체 삭제 기능용)
+drop policy if exists "public_delete_medicine" on public.medicine_inventory;
+create policy "public_delete_medicine"
+on public.medicine_inventory
+for delete
+to anon, authenticated
+using (true);

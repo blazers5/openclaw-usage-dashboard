@@ -33,7 +33,7 @@
       .save-btn{padding:9px 10px}
     }
 
-    @media (max-width: 560px){
+    @media (max-width: 900px){
       table{min-width:0;border:0;background:transparent}
       thead{display:none}
       tbody{display:block}
@@ -41,7 +41,8 @@
       td{display:block;border:0;padding:6px 4px}
       td[data-label]::before{content:attr(data-label);display:block;font-size:12px;color:#6b7280;margin-bottom:4px}
       .cell-input{min-width:0;width:100%}
-      .save-wrap{justify-content:flex-end}
+      .save-wrap{justify-content:flex-end;gap:8px}
+      .save-btn{min-width:64px}
     }
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
@@ -57,6 +58,7 @@
     <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
     <button id="adminLogin">관리자 로그인</button>
     <button id="adminLogout" style="display:none">로그아웃</button>
+    <button id="adminClearAll" style="display:none">전체 삭제</button>
     <span id="mode" class="pill">조회 전용</span>
     <button id="reload">새로고침</button>
   </div>
@@ -109,6 +111,7 @@ const statusEl = document.getElementById('status');
 const modeEl = document.getElementById('mode');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
+const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 
@@ -120,6 +123,7 @@ function setMode(){
   modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
   loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
   logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  adminClearAllBtn.style.display = isAdmin ? 'inline-block' : 'none';
 }
 
 function rowView(r){
@@ -145,6 +149,7 @@ function rowView(r){
       <td data-label="저장">
         <div class="save-wrap">
           <button class="save-btn" data-action="save">저장</button>
+          <button class="save-btn" data-action="delete">삭제</button>
         </div>
       </td>
     </tr>`;
@@ -155,6 +160,7 @@ function render(){
   const filtered = rows.filter(r => !k || String(r.no).includes(k) || nfc(r.name).toLowerCase().includes(k) || nfc(r.code).toLowerCase().includes(k));
   tb.innerHTML = filtered.map(rowView).join('');
   tb.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
+  tb.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
 }
 
 async function loadData(){
@@ -169,6 +175,34 @@ async function loadData(){
     expiry_date: r.expiry_date ? nfc(r.expiry_date) : ''
   }));
   statusEl.textContent = `총 ${rows.length}건 로드 완료`;
+  statusEl.className='row muted ok';
+  render();
+}
+
+async function deleteRow(e){
+  if(!confirm('이 행을 삭제할까요?')) return;
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const { error } = await db.from('medicine_inventory').delete().eq('id', id);
+  if(error){
+    alert('삭제 실패: ' + error.message + '\n\n(삭제 정책이 없을 수 있어. 내가 바로 SQL 한 줄 줄게.)');
+    return;
+  }
+  rows = rows.filter(x => String(x.id) !== String(id));
+  statusEl.textContent = `삭제 완료 (ID ${id})`;
+  statusEl.className='row muted ok';
+  render();
+}
+
+async function clearAllRows(){
+  if(!confirm('정말 전체 약품 데이터를 삭제할까요? 되돌릴 수 없습니다.')) return;
+  const { error } = await db.from('medicine_inventory').delete().gt('id', 0);
+  if(error){
+    alert('전체 삭제 실패: ' + error.message + '\n\n(삭제 정책 SQL 적용이 필요할 수 있어.)');
+    return;
+  }
+  rows = [];
+  statusEl.textContent = '전체 삭제 완료';
   statusEl.className='row muted ok';
   render();
 }
@@ -204,6 +238,7 @@ q.addEventListener('input', render);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
+adminClearAllBtn.addEventListener('click', clearAllRows);
 
 document.getElementById('pwCancel').addEventListener('click', closePwModal);
 document.getElementById('pwConfirm').addEventListener('click', ()=>{
