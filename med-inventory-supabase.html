@@ -38,13 +38,13 @@
     @media (max-width: 900px){
       .top{display:grid;grid-template-columns:1fr auto auto;gap:6px}
       #q{grid-column:1 / -1}
-      .table-wrap{overflow-x:auto}
-      table{min-width:920px;border:1px solid #e7ebf3;background:#fff}
+      .table-wrap{overflow-x:hidden}
+      table{width:100%;min-width:0;border:1px solid #e7ebf3;background:#fff;table-layout:fixed}
       thead{display:table-header-group}
       tbody{display:table-row-group}
       tr{display:table-row}
-      td{display:table-cell;padding:8px}
-      th{font-size:12px;padding:8px 8px;background:#f4f7ff}
+      td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       td[data-label]::before{content:none}
       .cell-input{min-width:80px;padding:6px 7px;font-size:12px}
       .save-wrap{justify-content:flex-start;gap:4px}
