@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>약품관리 시스템 (Supabase)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
+    .wrap{max-width:1100px;margin:0 auto}.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input,button{padding:10px;border:1px solid #ddd;border-radius:10px} input{font-size:16px}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:14px}
+    .muted{color:#6b7280;font-size:12px}.pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
+    .row{margin-top:10px}.footer{margin-top:10px;color:#666;font-size:12px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h2>약품관리 시스템 (공유형)</h2>
+  <div class="top">
+    <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+    <button id="adminLogin">관리자 로그인</button>
+    <button id="adminLogout" style="display:none">로그아웃</button>
+    <span id="mode" class="pill">조회 전용</span>
+    <button id="reload">새로고침</button>
+  </div>
+  <div class="row muted" id="status">연결 중...</div>
+  <div class="row">
+    <table>
+      <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th><th>D-Day</th></tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+  <div class="footer">기본 조회 전용 / 관리자 로그인 시 유효기간 편집 가능</div>
+</div>
+<script>
+const SUPABASE_URL = 'https://lkcugkmkabeeeigkazzn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_27Iqc8Qukobl8cK0PGUwzQ_HM5Gzw3n';
+const ADMIN_PASSWORD = 'qwer1234';
+const ADMIN_SESSION_KEY = 'med-admin-session-v1';
+let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
+let rows = [];
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const tb = document.getElementById('tb');
+const q = document.getElementById('q');
+const statusEl = document.getElementById('status');
+const modeEl = document.getElementById('mode');
+const loginBtn = document.getElementById('adminLogin');
+const logoutBtn = document.getElementById('adminLogout');
+
+function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
+function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function setMode(){
+  modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
+  loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
+  logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
+}
+
+function render(){
+  const k = nfc(q.value).toLowerCase();
+  const filtered = rows.filter(r => !k || String(r.no).includes(k) || nfc(r.name).toLowerCase().includes(k) || nfc(r.code).toLowerCase().includes(k));
+  tb.innerHTML = filtered.map(r => `
+    <tr>
+      <td>${r.no}</td>
+      <td>${esc(r.name)}</td>
+      <td><code>${esc(r.code)}</code></td>
+      <td><input type="date" data-id="${r.id}" value="${esc(r.expiry_date || '')}" ${isAdmin?'':'disabled'} /></td>
+      <td>${dday(r.expiry_date)}</td>
+    </tr>`).join('');
+  tb.querySelectorAll('input[type="date"]').forEach(el=>el.addEventListener('change', onEdit));
+}
+
+async function loadData(){
+  statusEl.textContent = '데이터 불러오는 중...';
+  const {data, error} = await db.from('medicine_inventory').select('*').order('no', {ascending:true});
+  if(error){ statusEl.textContent = '불러오기 실패: '+error.message; return; }
+  rows = (data||[]).map(r=>({
+    id:r.id, no:r.no, name:nfc(r.name), code:nfc(r.code), expiry_date:r.expiry_date ? nfc(r.expiry_date) : ''
+  }));
+  statusEl.textContent = `총 ${rows.length}건 로드 완료`;
+  render();
+}
+
+async function onEdit(e){
+  if(!isAdmin){ alert('관리자 로그인 후 수정 가능'); return; }
+  const id = e.target.dataset.id;
+  const expiry = nfc(e.target.value);
+  const { error } = await db.from('medicine_inventory').update({ expiry_date: expiry || null }).eq('id', id);
+  if(error){ alert('저장 실패: '+error.message); return; }
+  const idx = rows.findIndex(x=>String(x.id)===String(id));
+  if(idx>=0) rows[idx].expiry_date = expiry;
+  render();
+}
+
+q.addEventListener('input', render);
+loginBtn.addEventListener('click', ()=>{
+  const p = prompt('관리자 비밀번호 입력');
+  if(p===null) return;
+  if(nfc(p)===ADMIN_PASSWORD){ isAdmin=true; sessionStorage.setItem(ADMIN_SESSION_KEY,'1'); setMode(); render(); }
+  else alert('비밀번호 불일치');
+});
+logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
+document.getElementById('reload').addEventListener('click', loadData);
+
+setMode();
+loadData();
+</script>
+</body>
+</html>
