@@ -13,14 +13,14 @@
     input,button{padding:10px;border:1px solid #ddd;border-radius:10px}
     input{font-size:15px}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
-    th,td{padding:10px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:14px;vertical-align:middle}
+    th,td{padding:8px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:13px;vertical-align:middle}
     .muted{color:#6b7280;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
     .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
     .footer{margin-top:10px;color:#666;font-size:12px}
-    .cell-input{width:100%;min-width:110px}
-    .save-btn{padding:7px 10px;font-size:12px}
+    .cell-input{width:100%;min-width:96px;padding:8px}
+    .save-btn{padding:6px 8px;font-size:12px}
     .save-wrap{display:flex;gap:6px;align-items:center}
     .ok{color:#0f766e}.err{color:#b91c1c}
 
@@ -37,12 +37,15 @@
       table{min-width:0;border:0;background:transparent}
       thead{display:none}
       tbody{display:block}
-      tr{display:block;background:#fff;border:1px solid #e9e9e9;border-radius:12px;padding:8px;margin-bottom:10px}
-      td{display:block;border:0;padding:6px 4px}
-      td[data-label]::before{content:attr(data-label);display:block;font-size:12px;color:#6b7280;margin-bottom:4px}
-      .cell-input{min-width:0;width:100%}
-      .save-wrap{justify-content:flex-end;gap:8px}
-      .save-btn{min-width:64px}
+      tr{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#fff;border:1px solid #e9e9e9;border-radius:10px;padding:8px;margin-bottom:8px}
+      td{display:block;border:0;padding:2px}
+      td[data-label]::before{content:attr(data-label);display:block;font-size:11px;color:#6b7280;margin-bottom:3px}
+      td[data-label="약품명"]{grid-column:1 / -1}
+      td[data-label="저장"]{grid-column:1 / -1}
+      .cell-input{min-width:0;width:100%;padding:7px;font-size:14px}
+      .save-wrap{justify-content:flex-end;gap:6px}
+      .save-btn{min-width:56px;padding:7px 8px}
+      .footer{font-size:11px}
     }
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
@@ -58,6 +61,7 @@
     <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
     <button id="adminLogin">관리자 로그인</button>
     <button id="adminLogout" style="display:none">로그아웃</button>
+    <button id="adminAddRow" style="display:none">행 추가</button>
     <button id="adminClearAll" style="display:none">전체 삭제</button>
     <span id="mode" class="pill">조회 전용</span>
     <button id="reload">새로고침</button>
@@ -111,6 +115,7 @@ const statusEl = document.getElementById('status');
 const modeEl = document.getElementById('mode');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
+const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
@@ -123,6 +128,7 @@ function setMode(){
   modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
   loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
   logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  adminAddRowBtn.style.display = isAdmin ? 'inline-block' : 'none';
   adminClearAllBtn.style.display = isAdmin ? 'inline-block' : 'none';
 }
 
@@ -207,6 +213,34 @@ async function clearAllRows(){
   render();
 }
 
+async function addRow(){
+  const maxNo = rows.reduce((m,r)=>Math.max(m, Number(r.no)||0), 0);
+  const noInput = prompt('새 번호 입력', String(maxNo + 1));
+  if(noInput === null) return;
+  const no = Number(nfc(noInput));
+  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자여야 합니다.'); return; }
+  const name = nfc(prompt('약품명 입력', '신규 약품') || '');
+  if(!name){ alert('약품명을 입력해야 합니다.'); return; }
+  const code = nfc(prompt('약품코드 입력', 'new_code') || '');
+  if(!code){ alert('약품코드를 입력해야 합니다.'); return; }
+
+  const payload = { no, name, code, expiry_date: null };
+  const { data, error } = await db.from('medicine_inventory').insert(payload).select('*').single();
+  if(error){ alert('행 추가 실패: ' + error.message); return; }
+
+  rows.push({
+    id: data.id,
+    no: Number(data.no),
+    name: nfc(data.name),
+    code: nfc(data.code),
+    expiry_date: data.expiry_date ? nfc(data.expiry_date) : ''
+  });
+  rows.sort((a,b)=>a.no-b.no);
+  statusEl.textContent = `행 추가 완료 (ID ${data.id})`;
+  statusEl.className='row muted ok';
+  render();
+}
+
 async function saveRow(e){
   const tr = e.target.closest('tr');
   const id = tr.dataset.id;
@@ -238,6 +272,7 @@ q.addEventListener('input', render);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
+adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
 
 document.getElementById('pwCancel').addEventListener('click', closePwModal);
