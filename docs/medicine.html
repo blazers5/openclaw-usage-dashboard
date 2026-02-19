@@ -45,13 +45,11 @@
       tr{display:table-row}
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      /* 모바일: 번호-약품명 간격 최소화 + 유효기간 가독성 우선 */
-      th:nth-child(1), td:nth-child(1){width:34px;padding-right:4px}
-      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.4; padding-left:4px}
-      th:nth-child(3), td:nth-child(3){display:none} /* 약품코드 컬럼은 모바일 조회에서 숨김 */
-      th:nth-child(4), td:nth-child(4){width:112px; text-align:right; padding-right:4px; white-space:nowrap; overflow:visible; text-overflow:clip}
-      th:nth-child(5), td:nth-child(5){width:50px; text-align:right}
-      th:nth-child(6), td:nth-child(6){width:68px}
+      /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
+      th:nth-child(1), td:nth-child(1){width:30px;padding-right:2px}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
+      th:nth-child(3), td:nth-child(3){width:108px; text-align:right; white-space:nowrap}
+      th:nth-child(4), td:nth-child(4){width:66px}
       td[data-label]::before{content:none}
       .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
       .save-wrap{justify-content:flex-start;gap:4px}
@@ -84,12 +82,10 @@
     <table>
       <thead>
         <tr>
-          <th style="width:90px">번호</th>
-          <th>약품명</th>
-          <th style="width:170px">약품코드</th>
-          <th style="width:160px">유효기간</th>
-          <th style="width:90px">D-Day</th>
-          <th style="width:90px">저장</th>
+          <th style="width:64px">번호</th>
+          <th>약품명(코드)</th>
+          <th style="width:120px">유효기간</th>
+          <th style="width:72px">저장</th>
         </tr>
       </thead>
       <tbody id="tb"></tbody>
@@ -148,10 +144,8 @@ function rowView(r){
     return `
       <tr data-id="${r.id}">
         <td data-label="번호">${r.no}</td>
-        <td data-label="약품명">${esc(r.name)}</td>
-        <td data-label="약품코드"><code>${esc(r.code)}</code></td>
+        <td data-label="약품명">${esc(r.name)} <span class="muted">(${esc(r.code)})</span></td>
         <td data-label="유효기간">${r.expiry_date || '—'}</td>
-        <td data-label="D-Day">${dday(r.expiry_date)}</td>
         <td data-label="저장" class="muted">-</td>
       </tr>`;
   }
@@ -159,10 +153,11 @@ function rowView(r){
   return `
     <tr data-id="${r.id}">
       <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
-      <td data-label="약품명"><input class="cell-input" data-field="name" value="${esc(r.name)}" /></td>
-      <td data-label="약품코드"><input class="cell-input" data-field="code" value="${esc(r.code)}" /></td>
+      <td data-label="약품명">
+        <input class="cell-input" data-field="name" value="${esc(r.name)}" />
+        <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
+      </td>
       <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
-      <td data-label="D-Day">${dday(r.expiry_date)}</td>
       <td data-label="저장">
         <div class="save-wrap">
           <button class="save-btn" data-action="save">저장</button>
