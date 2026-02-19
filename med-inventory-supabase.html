@@ -45,8 +45,15 @@
       tr{display:table-row}
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      /* 모바일에서 약품명은 항상 보이게 우선폭/줄바꿈 허용 */
+      th:nth-child(1), td:nth-child(1){width:52px}
+      th:nth-child(2), td:nth-child(2){width:38%; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip}
+      th:nth-child(3), td:nth-child(3){width:86px}
+      th:nth-child(4), td:nth-child(4){width:110px}
+      th:nth-child(5), td:nth-child(5){width:58px}
+      th:nth-child(6), td:nth-child(6){width:78px}
       td[data-label]::before{content:none}
-      .cell-input{min-width:80px;padding:6px 7px;font-size:12px}
+      .cell-input{min-width:72px;padding:6px 7px;font-size:12px}
       .save-wrap{justify-content:flex-start;gap:4px}
       .save-btn{min-width:50px;padding:6px 7px;font-size:11px}
       .footer{font-size:11px}
