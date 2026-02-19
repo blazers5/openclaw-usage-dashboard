@@ -45,13 +45,13 @@
       tr{display:table-row}
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      /* 모바일에서 약품명은 항상 보이게 우선폭/줄바꿈 허용 */
-      th:nth-child(1), td:nth-child(1){width:40px}
-      th:nth-child(2), td:nth-child(2){width:46%; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.4}
-      th:nth-child(3), td:nth-child(3){width:72px}
-      th:nth-child(4), td:nth-child(4){width:104px; text-align:right; padding-right:6px}
-      th:nth-child(5), td:nth-child(5){width:52px; text-align:right}
-      th:nth-child(6), td:nth-child(6){width:72px}
+      /* 모바일: 번호-약품명 간격 최소화 + 유효기간 가독성 우선 */
+      th:nth-child(1), td:nth-child(1){width:34px;padding-right:4px}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.4; padding-left:4px}
+      th:nth-child(3), td:nth-child(3){display:none} /* 약품코드 컬럼은 모바일 조회에서 숨김 */
+      th:nth-child(4), td:nth-child(4){width:112px; text-align:right; padding-right:4px; white-space:nowrap; overflow:visible; text-overflow:clip}
+      th:nth-child(5), td:nth-child(5){width:50px; text-align:right}
+      th:nth-child(6), td:nth-child(6){width:68px}
       td[data-label]::before{content:none}
       .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
       .save-wrap{justify-content:flex-start;gap:4px}
