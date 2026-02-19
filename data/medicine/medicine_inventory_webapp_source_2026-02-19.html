@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>약품 조회 · 유효기간 편집</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="약품 유효기간" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; margin: 0; padding: 16px; background: #f7f7f8; }
+    .container { max-width: 1024px; margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 12px; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+    .buttons { display:flex; gap:8px; flex-wrap: wrap; }
+    button { padding: 10px 14px; border: 1px solid #ddd; background: white; border-radius: 10px; cursor: pointer; }
+    button:active { transform: scale(0.98); }
+    .card { background: white; border: 1px solid #eee; border-radius: 14px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #f0f0f0; }
+    th { font-weight: 700; font-size: 14px; color: #333; }
+    td { font-size: 14px; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fafafa; font-size: 12px; }
+    .muted { color: #6b7280; }
+    .result-meta { display:flex; justify-content:space-between; align-items:center; margin: 10px 0; color: #6b7280; font-size: 13px; gap: 8px; flex-wrap: wrap; }
+    .footer { margin-top: 14px; color: #9ca3af; font-size: 12px; text-align:center; }
+    .expiring { background: #fff7ed; }
+    input[type="date"] { padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; }
+    @media (max-width: 640px) {
+      th:nth-child(3), td:nth-child(3) { display: none; } /* 코드 칼럼은 모바일에서 숨김 */
+    }
+  
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>약품 조회 · 유효기간 편집</h1>
+    <div class="toolbar">
+      <input id="q" type="text" placeholder="약품명 / 번호 / 코드 / 유효기간(예: 2026-05-01)" autofocus />
+      <div class="buttons">
+        <button id="sortNo">번호순</button>
+        <button id="sortName">이름순</button>
+        <button id="sortExp">유효기간순</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="result-meta">
+        <div><span id="count" class="pill">0개</span> <span class="muted" id="hint">검색어를 입력하거나 유효기간을 직접 수정하세요</span></div>
+        <div class="buttons">
+          <button id="filterExp30" title="유효기간이 30일 이내">임박(30일)</button>
+          <button id="exportCsv">CSV로 저장</button>
+          <label for="importCsv" class="button-like" style="display:inline-block;">
+            <input id="importCsv" type="file" accept=".csv" style="display:none" />
+            <span style="padding:10px 14px; border:1px solid #ddd; border-radius:10px; background:white; cursor:pointer;">CSV 불러오기</span>
+          </label>
+          <button id="clearLocal">내 수정내용 초기화</button>
+        </div>
+      </div>
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th style="width:90px">번호</th>
+            <th>약품명</th>
+            <th style="width:160px">약품코드</th>
+            <th style="width:180px">유효기간 (편집)</th>
+            <th style="width:90px">D-Day</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="footer">iPhone/PC 모두 지원 · 오프라인 동작 · 수정내용은 자동 저장(localStorage) · CSV로 내보내기/불러오기 지원</div>
+  </div>
+  <script>
+    const ORIGIN_DATA = [{"번호": 1, "약품명": "발트렉스정500mg", "약품코드": "vacv", "유효기간": ""}, {"번호": 2, "약품명": "리포덱스450mg", "약품코드": "rf45", "유효기간": ""}, {"번호": 3, "약품명": "기넥신에프정", "약품코드": "gkb", "유효기간": "2026-12-11"}, {"번호": 4, "약품명": "디튜린정0.1mg", "약품코드": "dsmp0.1", "유효기간": "2028-02-11"}, {"번호": 5, "약품명": "큐티핀정25mg", "약품코드": "quet1", "유효기간": "2028-06-03"}, {"번호": 7, "약품명": "칼디플러스", "약품코드": "cald1", "유효기간": "2028-07-02"}, {"번호": 8, "약품명": "클래리시드엑스엘", "약품코드": "cltm50", "유효기간": ""}, {"번호": 9, "약품명": "애피언트10mg", "약품코드": "effi", "유효기간": ""}, {"번호": 10, "약품명": "바난정(씨제이)", "약품코드": "bann", "유효기간": "2028-04-16"}, {"번호": 11, "약품명": "쿠에타핀 정 12.5mg ", "약품코드": "quet0.5", "유효기간": "2028-07-03"}, {"번호": 13, "약품명": "모록사신400mg", "약품코드": "avlx3", "유효기간": ""}, {"번호": 14, "약품명": "일성이솦틴서방정180mg", "약품코드": "vpm", "유효기간": ""}, {"번호": 15, "약품명": "후라시닐정", "약품코드": "fla", "유효기간": ""}, {"번호": 16, "약품명": "테놀민정50mg", "약품코드": "atn50", "유효기간": "2028-02-10"}, {"번호": 17, "약품명": "아디팜정", "약품코드": "hoz", "유효기간": ""}, {"번호": 19, "약품명": "메섹신캅셀500mg", "약품코드": "msx1", "유효기간": "2026-12-24"}, {"번호": 20, "약품명": "다이아벡스정1000mg", "약품코드": "gph10", "유효기간": "2027-12-05"}, {"번호": 21, "약품명": "글리멜정2mg", "약품코드": "glmp", "유효기간": ""}, {"번호": 22, "약품명": "디오살탄정40mg", "약품코드": "dio40", "유효기간": "2028-03-02"}, {"번호": 23, "약품명": "리록스반정15mg", "약품코드": "xarel15", "유효기간": "2027-03-31"}, {"번호": 25, "약품명": "엘탄 서방정 60mg", "약품코드": "isod1", "유효기간": ""}, {"번호": 26, "약품명": "다이아벡스XR서방정", "약품코드": "gph-xr", "유효기간": "2027-09-01"}, {"번호": 27, "약품명": "아토르바10mg", "약품코드": "lipi10", "유효기간": "2027-04-30"}, {"번호": 28, "약품명": "판토라인20mg", "약품코드": "ptp2", "유효기간": "2027-12-11"}, {"번호": 29, "약품명": "엘리퀴스정2.5mg", "약품코드": "eliqs", "유효기간": "2027-04-30"}, {"번호": 30, "약품명": "베라스트정 0.02mg ", "약품코드": "bera2", "유효기간": "2027-10-22"}, {"번호": 61, "약품명": "리피논정80mg", "약품코드": "lipn8", "유효기간": "2027-04-23"}, {"번호": 62, "약품명": "베니톨정", "약품코드": "veni", "유효기간": "2027-07-23"}, {"번호": 63, "약품명": "액시마", "약품코드": "asm", "유효기간": "2028-05-29"}, {"번호": 64, "약품명": "독시사이클린정100mg", "약품코드": "doxy4", "유효기간": "2028-03-22"}, {"번호": 65, "약품명": "베시스타정5mg", "약품코드": "vesi1", "유효기간": "2028-05-18"}, {"번호": 67, "약품명": "듀록타 캡슐 60mg", "약품코드": "duxe60", "유효기간": "2027-09-22"}, {"번호": 68, "약품명": "디오반필름코팅정320mg", "약품코드": "dio32", "유효기간": "2027-08-31"}, {"번호": 69, "약품명": "베아제정", "약품코드": "bease", "유효기간": "2027-06-04"}, {"번호": 70, "약품명": "안플라그정100mg", "약품코드": "sapg1", "유효기간": "2028-05-01"}, {"번호": 73, "약품명": "치옥티아", "약품코드": "thio-hr1", "유효기간": "2027-06-24"}, {"번호": 74, "약품명": "뮤코테인캡슐", "약품코드": "surf3", "유효기간": "2027-10-01"}, {"번호": 75, "약품명": "마이암부톨", "약품코드": "emb1", "유효기간": "2028-03-20"}, {"번호": 76, "약품명": "산화마그네슘정250mg", "약품코드": "mgo", "유효기간": "2027-04-03"}, {"번호": 77, "약품명": "리바로정2mg", "약품코드": "piva2", "유효기간": ""}, {"번호": 79, "약품명": "비타메진50mg", "약품코드": "vtm", "유효기간": "2028-04-02"}, {"번호": 80, "약품명": "고덱스", "약품코드": "godex", "유효기간": "2028-03-20"}, {"번호": 81, "약품명": "플라빅스에이", "약품코드": "clpda", "유효기간": "2027-03-31"}, {"번호": 82, "약품명": "아다핀오스서방정30mg", "약품코드": "nife3", "유효기간": "2026-06-18"}, {"번호": 83, "약품명": "신일피리독신정", "약품코드": "vb6", "유효기간": ""}, {"번호": 85, "약품명": "아지로신정", "약품코드": "zim25", "유효기간": ""}, {"번호": 86, "약품명": "테올란비서방캅셀", "약품코드": "teol", "유효기간": ""}, {"번호": 87, "약품명": "아세트아미노펜300", "약품코드": "aap3", "유효기간": "2028-02-11"}, {"번호": 88, "약품명": "루키오정10mg", "약품코드": "sing1", "유효기간": "2028-01-05"}, {"번호": 89, "약품명": "노바스크", "약품코드": "nor", "유효기간": "2027-01-12"}, {"번호": 90, "약품명": "오팔몬정", "약품코드": "lip", "유효기간": "2028-04-13"}, {"번호": 121, "약품명": "반코진캡슐125mg", "약품코드": "van", "유효기간": "2028-06-17"}, {"번호": 122, "약품명": "애니세프캅셀", "약품코드": "cfd1", "유효기간": ""}, {"번호": 123, "약품명": "코다론정", "약품코드": "coda", "유효기간": "2028-06-03"}, {"번호": 124, "약품명": "대원아미노필린정100mg", "약품코드": "ascta", "유효기간": ""}, {"번호": 125, "약품명": "아스피린장용정", "약품코드": "asap", "유효기간": "2028-05-12"}, {"번호": 127, "약품명": "디트로딘에스알캡슐4mg", "약품코드": "tfdsr4", "유효기간": ""}, {"번호": 128, "약품명": "가바펜틴캡슐 100mg", "약품코드": "gaba1d", "유효기간": "2028-02-20"}, {"번호": 128, "약품명": "가바펜틴캡슐 100mg", "약품코드": "gaba1dc", "유효기간": "2028-02-20"}, {"번호": 129, "약품명": "보나링에이", "약품코드": "dmm", "유효기간": "2028-06-09"}, {"번호": 130, "약품명": "아서틸정8mg", "약품코드": "ace8", "유효기간": ""}, {"번호": 131, "약품명": "에나폰", "약품코드": "ena", "유효기간": ""}, {"번호": 133, "약품명": "리리카50mg", "약품코드": "lyri5", "유효기간": "2028-01-19"}, {"번호": 134, "약품명": "로파인캡슐", "약품코드": "lpr3", "유효기간": ""}, {"번호": 136, "약품명": "오잘탄정50mg", "약품코드": "lst1", "유효기간": ""}, {"번호": 137, "약품명": "비바코정10mg", "약품코드": "cres3", "유효기간": "2027-08-31"}, {"번호": 139, "약품명": "펙소나딘 정 120mg", "약품코드": "alle1", "유효기간": "2028-06-03"}, {"번호": 140, "약품명": "아프로벨정300mg", "약품코드": "ibst3", "유효기간": "2027-10-22"}, {"번호": 141, "약품명": "부루펜정200mg", "약품코드": "bf1", "유효기간": "2030-05-07"}, {"번호": 142, "약품명": "리페리돈정0.5mg", "약품코드": "risp0.5", "유효기간": ""}, {"번호": 143, "약품명": "에이프렉사 정 2.5mg", "약품코드": "zypr2", "유효기간": ""}, {"번호": 145, "약품명": "멀택정", "약품코드": "multac", "유효기간": ""}, {"번호": 147, "약품명": "로수젯정10/10mg", "약품코드": "crez2", "유효기간": "2028-05-08"}, {"번호": 149, "약품명": "유한짓", "약품코드": "inh", "유효기간": ""}, {"번호": 150, "약품명": "신지로이드", "약품코드": "syn", "유효기간": "2028-05-22"}, {"번호": 182, "약품명": "글리아티린연질캡슐 ", "약품코드": "glia2", "유효기간": "2028-06-20"}, {"번호": 183, "약품명": "글리멜정4mg", "약품코드": "glmd4", "유효기간": ""}, {"번호": 184, "약품명": "헤르벤", "약품코드": "herb", "유효기간": "2028-04-29"}, {"번호": 185, "약품명": "레복사신정100mg", "약품코드": "lofx2", "유효기간": "2027-11-10"}, {"번호": 188, "약품명": "펙소스타", "약품코드": "fexo", "유효기간": ""}, {"번호": 189, "약품명": "디아미크롱서방정60mg", "약품코드": "gc6", "유효기간": "2028-02-18"}, {"번호": 190, "약품명": "아세로", "약품코드": "acl", "유효기간": "2028-03-23"}, {"번호": 191, "약품명": "릭시아나정30mg", "약품코드": "lixi3", "유효기간": "2030-03-23"}, {"번호": 193, "약품명": "엘리퀴스정5mg", "약품코드": "eliqs5", "유효기간": "2027-04-30"}, {"번호": 195, "약품명": "훼로바-유서방정", "약품코드": "fero-u", "유효기간": "2028-06-08"}, {"번호": 196, "약품명": "바스티난서방정", "약품코드": "tmz-mr", "유효기간": "2028-01-14"}, {"번호": 197, "약품명": "티로파", "약품코드": "tiro", "유효기간": "2030-06-10"}, {"번호": 201, "약품명": "팜시버 정 250mg", "약품코드": "famcv1", "유효기간": "2028-04-11"}, {"번호": 202, "약품명": "유니네콜정25mg", "약품코드": "btc25", "유효기간": "2028-05-16"}, {"번호": 203, "약품명": "가스터디정", "약품코드": "gstd", "유효기간": "2027-12-31"}, {"번호": 207, "약품명": "빔스크정100mg", "약품코드": "lacosa1", "유효기간": "2027-11-03"}, {"번호": 208, "약품명": "오로살탄5/80", "약품코드": "orsal", "유효기간": "2028-06-02"}, {"번호": 209, "약품명": "탐스오디정", "약품코드": "har-d1", "유효기간": "2028-06-03"}, {"번호": 210, "약품명": "피나스테리드정5mg", "약품코드": "pros3", "유효기간": "2027-04-04"}, {"번호": 213, "약품명": "노르믹스정", "약품코드": "nrmx", "유효기간": "2028-05-13"}, {"번호": 214, "약품명": "스피로닥톤정25mg", "약품코드": "spr", "유효기간": "2028-07-14"}, {"번호": 215, "약품명": "엔테론정150mg", "약품코드": "ent", "유효기간": "2028-06-03"}, {"번호": 216, "약품명": "비유피-4정20mg", "약품코드": "ppv", "유효기간": ""}, {"번호": 219, "약품명": "셉트린정", "약품코드": "ts1", "유효기간": ""}, {"번호": 220, "약품명": "액티피드", "약품코드": "afdj", "유효기간": ""}, {"번호": 221, "약품명": "디오살탄정80mg", "약품코드": "dio80", "유효기간": "2028-06-29"}, {"번호": 222, "약품명": "코프렐", "약품코드": "cof", "유효기간": ""}, {"번호": 225, "약품명": "자디앙정25mg", "약품코드": "jard1", "유효기간": "2027-10-31"}, {"번호": 226, "약품명": "다파엔정10mg", "약품코드": "foxig1", "유효기간": "2028-07-13"}, {"번호": 227, "약품명": "아리페질정", "약품코드": "dnpz5", "유효기간": "2027-04-29"}, {"번호": 228, "약품명": "릭시아나정15mg", "약품코드": "lixi15", "유효기간": ""}, {"번호": 31, "약품명": "리포덱스600mg", "약품코드": "rf6", "유효기간": ""}, {"번호": 32, "약품명": "트레스탄캡슐", "약품코드": "tst", "유효기간": "2028-04-23"}, {"번호": 33, "약품명": "미라벡서방정50mg", "약품코드": "betm1", "유효기간": "2028-06-10"}, {"번호": 34, "약품명": "모티리톤정", "약품코드": "moti", "유효기간": "2027-03-19"}, {"번호": 35, "약품명": "바소트롤6.25mg", "약품코드": "cvd6.25", "유효기간": "2028-03-29"}, {"번호": 36, "약품명": "피어리존", "약품코드": "pgtz1", "유효기간": "2028-08-18"}, {"번호": 37, "약품명": "옥사제핀정300mg", "약품코드": "oxcb30", "유효기간": ""}, {"번호": 38, "약품명": "세푸록심악세틸", "약품코드": "cfrx3", "유효기간": "2027-11-08"}, {"번호": 39, "약품명": "제피토정10/10mg", "약품코드": "lipoz2", "유효기간": "2028-03-31"}, {"번호": 41, "약품명": "멕페란정", "약품코드": "macp", "유효기간": ""}, {"번호": 42, "약품명": "리큅정0.25mg", "약품코드": "rqp0.25", "유효기간": "2027-05-25"}, {"번호": 43, "약품명": "글라포민엠2/500mg", "약품코드": "glmm3", "유효기간": ""}, {"번호": 44, "약품명": "레비라정500mg", "약품코드": "kepra3", "유효기간": "2028-03-17"}, {"번호": 45, "약품명": "파라마셋", "약품코드": "at2", "유효기간": "2027-08-20"}, {"번호": 46, "약품명": "가스모틴", "약품코드": "mosa", "유효기간": "2028-06-27"}, {"번호": 47, "약품명": "바소트롤정25mg", "약품코드": "cvd2", "유효기간": "2027-09-23"}, {"번호": 48, "약품명": "콩코르정2.5mg", "약품코드": "bis2.5", "유효기간": "2027-06-03"}, {"번호": 49, "약품명": "메디락에스장용캅셀", "약품코드": "medl", "유효기간": "2027-09-22"}, {"번호": 50, "약품명": "테베텐", "약품코드": "teve", "유효기간": ""}, {"번호": 51, "약품명": "엔트레스토필름코팅정50mg", "약품코드": "sacval1", "유효기간": ""}, {"번호": 52, "약품명": "독사존엑스엘서방정4mg", "약품코드": "cdr1", "유효기간": ""}, {"번호": 53, "약품명": "실타졸50mg", "약품코드": "clz5", "유효기간": "2027-03-27"}, {"번호": 54, "약품명": "소메론정", "약품코드": "mpd2", "유효기간": "2028-05-20"}, {"번호": 55, "약품명": "써스펜이알서방정", "약품코드": "aap65", "유효기간": "2028-07-18"}, {"번호": 56, "약품명": "아벨탄플러스정300/12.5", "약품코드": "ibst3z1", "유효기간": "2027-07-15"}, {"번호": 57, "약품명": "스티렌", "약품코드": "eupa", "유효기간": "2028-04-26"}, {"번호": 58, "약품명": "토피라정", "약품코드": "topa1", "유효기간": ""}, {"번호": 59, "약품명": "콜킨정", "약품코드": "cco", "유효기간": ""}, {"번호": 60, "약품명": "하이그로톤정25mg", "약품코드": "hygro", "유효기간": ""}, {"번호": 91, "약품명": "프리아틸정600mg", "약품코드": "cys6", "유효기간": "2027-06-25"}, {"번호": 92, "약품명": "아벨탄플러스정 150/12.5mg", "약품코드": "ibstp1", "유효기간": "2027-04-22"}, {"번호": 93, "약품명": "케이콘틴서방정 600mg", "약품코드": "kcl", "유효기간": "2028-03-23"}, {"번호": 94, "약품명": "뮤코펙트", "약품코드": "abx2", "유효기간": "2028-02-04"}, {"번호": 95, "약품명": "호이스타", "약품코드": "foy2", "유효기간": "2028-07-07"}, {"번호": 96, "약품명": "솝튼정", "약품코드": "srda1", "유효기간": "2028-05-29"}, {"번호": 97, "약품명": "케타스", "약품코드": "ibud", "유효기간": ""}, {"번호": 98, "약품명": "듀로셉톨캡슐30mg", "약품코드": "duxe1", "유효기간": "2027-07-31"}, {"번호": 99, "약품명": "니코피온서방정150mg", "약품코드": "nicop", "유효기간": ""}, {"번호": 100, "약품명": "우루사", "약품코드": "udca", "유효기간": "2028-08-20"}, {"번호": 101, "약품명": "염산에페리손정", "약품코드": "epe1", "유효기간": "2027-11-05"}, {"번호": 102, "약품명": "네비레트 엠 정 2.5mg", "약품코드": "nebi1", "유효기간": "2028-06-24"}, {"번호": 104, "약품명": "실로스탄씨알정200mg", "약품코드": "clzcr", "유효기간": ""}, {"번호": 105, "약품명": "릭시아나60mg", "약품코드": "lixi6", "유효기간": ""}, {"번호": 106, "약품명": "스타브론정", "약품코드": "star", "유효기간": "2026-09-29"}, {"번호": 107, "약품명": "오르필서방정150mg", "약품코드": "valp15", "유효기간": "2028-09-03"}, {"번호": 108, "약품명": "자트랄엑스엘정10mg", "약품코드": "xatral", "유효기간": "2028-07-21"}, {"번호": 109, "약품명": "실로스타졸캡슐100mg", "약품코드": "clz10", "유효기간": "2028-07-08"}, {"번호": 110, "약품명": "페니토인", "약품코드": "dlt", "유효기간": ""}, {"번호": 111, "약품명": "엔시트라세미정", "약품코드": "at0.5", "유효기간": "2026-10-04"}, {"번호": 112, "약품명": "인데놀정40mg", "약품코드": "ppl", "유효기간": ""}, {"번호": 113, "약품명": "페니라민정", "약품코드": "pr", "유효기간": "2028-04-21"}, {"번호": 114, "약품명": "애니디핀에스정2.5mg", "약품코드": "amd0.5", "유효기간": ""}, {"번호": 115, "약품명": "세레브렉스 200mg", "약품코드": "cele", "유효기간": "2027-05-14"}, {"번호": 116, "약품명": "세파클러캅셀", "약품코드": "cfc", "유효기간": "2028-07-14"}, {"번호": 117, "약품명": "타스나정500mg", "약품코드": "nb", "유효기간": ""}, {"번호": 118, "약품명": "후릭스정40mg", "약품코드": "furo", "유효기간": "2028-04-02"}, {"번호": 119, "약품명": "브린텔릭스정10mg", "약품코드": "brimt", "유효기간": ""}, {"번호": 120, "약품명": "시그마트정5mg", "약품코드": "sig", "유효기간": ""}, {"번호": 151, "약품명": "리리카캡슐75mg", "약품코드": "lyri0.5", "유효기간": "2027-07-02"}, {"번호": 151, "약품명": "리리카캡슐75mg", "약품코드": "lyri0.5c", "유효기간": "2027-07-02"}, {"번호": 152, "약품명": "지트람엑스엘서방정150mg", "약품코드": "tmd15", "유효기간": ""}, {"번호": 153, "약품명": "다이아벡스정500mg", "약품코드": "gph", "유효기간": "2027-08-27"}, {"번호": 154, "약품명": "플라비톨정 (동아)", "약품코드": "clpd3", "유효기간": "2028-03-09"}, {"번호": 155, "약품명": "리록스반정20mg", "약품코드": "xarel20", "유효기간": "2028-03-24"}, {"번호": 156, "약품명": "칸데모어정8mg", "약품코드": "ata1", "유효기간": "2028-10-21"}, {"번호": 157, "약품명": "디트로딘에스알캡슐2mg", "약품코드": "tfdsr2", "유효기간": ""}, {"번호": 158, "약품명": "판토라인40mg", "약품코드": "ptp4", "유효기간": "2027-12-11"}, {"번호": 159, "약품명": "싸이신정250mg", "약품코드": "cipro", "유효기간": "2027-07-28"}, {"번호": 160, "약품명": "자이로릭정", "약품코드": "zyr", "유효기간": ""}, {"번호": 161, "약품명": "부광메티마졸정5mg", "약품코드": "mtm", "유효기간": ""}, {"번호": 162, "약품명": "트리티코", "약품코드": "tz25", "유효기간": "2029-04-29"}, {"번호": 163, "약품명": "아노렉스캡슐25mg", "약품코드": "anorrx", "유효기간": ""}, {"번호": 164, "약품명": "메만토정", "약품코드": "dimen2", "유효기간": "2027-12-05"}, {"번호": 165, "약품명": "니모디핀", "약품코드": "nimo3", "유효기간": ""}, {"번호": 166, "약품명": "삐콤", "약품코드": "b", "유효기간": "2026-09-19"}, {"번호": 167, "약품명": "테프라정40mg", "약품코드": "ppl2", "유효기간": ""}, {"번호": 168, "약품명": "비유피-4정10mg", "약품코드": "ppv0.5", "유효기간": "2028-08-26"}, {"번호": 169, "약품명": "도란사민캅셀", "약품코드": "trs", "유효기간": "2028-05-13"}, {"번호": 170, "약품명": "포리부틴정150mg", "약품코드": "polib15", "유효기간": "2028-06-15"}, {"번호": 171, "약품명": "아토르바20mg", "약품코드": "lipi20", "유효기간": "2027-01-16"}, {"번호": 172, "약품명": "크레스논정20mg", "약품코드": "cres20", "유효기간": "2027-02-03"}, {"번호": 173, "약품명": "바클로펜10mg", "약품코드": "bclo", "유효기간": ""}, {"번호": 174, "약품명": "미드론정", "약품코드": "midro", "유효기간": "2027-09-24"}, {"번호": 175, "약품명": "리리카캡150mg", "약품코드": "lyri", "유효기간": "2027-07-15"}, {"번호": 175, "약품명": "리리카캡슐150mg", "약품코드": "lyric", "유효기간": ""}, {"번호": 176, "약품명": "피케이멜즈정 100mg", "약품코드": "pk-mz", "유효기간": ""}, {"번호": 177, "약품명": "엔토레스토필름코팅정100mg", "약품코드": "sacval2", "유효기간": ""}, {"번호": 178, "약품명": "메네스에스정", "약품코드": "menias", "유효기간": "2027-06-12"}, {"번호": 179, "약품명": "칸데모어정16mg", "약품코드": "ata2", "유효기간": ""}, {"번호": 180, "약품명": "신일염산티아민정10mg", "약품코드": "thi", "유효기간": ""}, {"번호": 241, "약품명": "푸루나졸캅셀50mg ", "약품코드": "fcnz", "유효기간": "2027-01-08"}, {"번호": 242, "약품명": "슈프락스캅셀100mg", "약품코드": "cfx1", "유효기간": "2027-03-30"}, {"번호": 243, "약품명": "둘코락스 에스 장용정 ", "약품코드": "dul1", "유효기간": ""}, {"번호": 244, "약품명": "자디앙정 10mg", "약품코드": "jard", "유효기간": "2028-01-31"}, {"번호": 245, "약품명": "에크로바정400mg", "약품코드": "acv40", "유효기간": ""}, {"번호": 247, "약품명": "유크라정625mg", "약품코드": "aug", "유효기간": "2027-03-09"}, {"번호": 248, "약품명": "글루코바이정50mg ", "약품코드": "gb", "유효기간": ""}, {"번호": 249, "약품명": "리리카 캡슐 25mg", "약품코드": "lyri25", "유효기간": ""}, {"번호": 250, "약품명": "렉사큐어정 5mg ", "약품코드": "rexa5", "유효기간": "2026-10-15"}, {"번호": 251, "약품명": "부스파정 5mg ", "약품코드": "bpr", "유효기간": "2027-07-27"}, {"번호": 253, "약품명": "애니코프캡슐300mg", "약품코드": "thebr", "유효기간": "2027-02-25"}, {"번호": 254, "약품명": "데카키논캅셀5mg", "약품코드": "dq", "유효기간": ""}, {"번호": 255, "약품명": "가브스정 50mg", "약품코드": "galv1", "유효기간": "2027-11-21"}, {"번호": 256, "약품명": "소론도정", "약품코드": "pd", "유효기간": "2028-04-13"}, {"번호": 257, "약품명": "메프친25mcg", "약품코드": "mept25", "유효기간": "2028-01-07"}, {"번호": 261, "약품명": "마그밀정500mg ", "약품코드": "mgt", "유효기간": "2028-09-17"}, {"번호": 262, "약품명": "다이크로짓정 25mg", "약품코드": "dz", "유효기간": "2027-05-22"}, {"번호": 263, "약품명": "바소트롤정12.5mg", "약품코드": "cvd0.5", "유효기간": "2028-03-29"}, {"번호": 267, "약품명": "이노엔 아벨탄 정 150mg", "약품코드": "ibst1", "유효기간": "2028-03-03"}, {"번호": 268, "약품명": "폴산정1mg", "약품코드": "folic", "유효기간": ""}, {"번호": 269, "약품명": "신일 브롬헥신염산염 정", "약품코드": "bhx", "유효기간": "2028-05-19"}, {"번호": 270, "약품명": "목틴 캡슐 200mg", "약품코드": "cys1", "유효기간": "2028-02-27"}, {"번호": 274, "약품명": "레보젠정 25mg ", "약품코드": "levo5", "유효기간": "2028-03-24"}, {"번호": 275, "약품명": "파마 프로시클리딘정", "약품코드": "prom2", "유효기간": ""}, {"번호": 276, "약품명": "쎄레브렉스캡슐100mg", "약품코드": "cele100", "유효기간": "2028-05-08"}, {"번호": 281, "약품명": "디고신정", "약품코드": "dgx", "유효기간": ""}, {"번호": 282, "약품명": "곰실린캡슐 500mg ", "약품코드": "amx50", "유효기간": "2026-06-26"}, {"번호": 288, "약품명": "피라진아미드정500mg", "약품코드": "pza", "유효기간": ""}, {"번호": 294, "약품명": "가바펜틴캡슐300mg", "약품코드": "gaba3dc", "유효기간": "2027-07-01"}];
+    const LS_KEY = 'med-expiry-v1';
+    let DATA = loadLocal() || ORIGIN_DATA.slice();
+    let sortKey = '번호';
+    let sortAsc = true;
+    let expOnly30 = false;
+
+    const q = document.getElementById('q');
+    const tbody = document.querySelector('#tbl tbody');
+    const count = document.getElementById('count');
+    const hint = document.getElementById('hint');
+    const sortNoBtn = document.getElementById('sortNo');
+    const sortNameBtn = document.getElementById('sortName');
+    const sortExpBtn = document.getElementById('sortExp');
+    const filterExp30Btn = document.getElementById('filterExp30');
+    const exportCsvBtn = document.getElementById('exportCsv');
+    const importCsvInput = document.getElementById('importCsv');
+    const clearLocalBtn = document.getElementById('clearLocal');
+
+    function loadLocal() {
+      try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) { return null; }
+    }
+    function saveLocal() { localStorage.setItem(LS_KEY, JSON.stringify(DATA)); }
+
+    function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+    function parseDate(s) { if (!s) return null; const t = Date.parse(s); return isNaN(t) ? null : new Date(t); }
+    function daysUntil(dateStr) { const d = parseDate(dateStr); if (!d) return null; const today = new Date(); today.setHours(0,0,0,0); const diff = (d - today)/(1000*60*60*24); return Math.floor(diff); }
+
+    function filterRows(query) {
+      const text = query.trim().toLowerCase();
+      let rows = DATA.filter(r => {
+        if (expOnly30) { const left = daysUntil(r["유효기간"]); if (left === null || left > 30) return false; }
+        if (!text) return true;
+        return (
+          String(r["번호"]).includes(text) ||
+          String(r["약품코드"]).toLowerCase().includes(text) ||
+          String(r["약품명"]).toLowerCase().includes(text) ||
+          String(r["유효기간"]).toLowerCase().includes(text)
+        );
+      });
+      return rows;
+    }
+
+    function sortRows(rows) {
+      return rows.sort((a,b) => {
+        let av = a[sortKey], bv = b[sortKey];
+        if (sortKey === '번호') { av = Number(av); bv = Number(bv); }
+        else if (sortKey === '유효기간') {
+          av = parseDate(av) ? parseDate(av).getTime() : Infinity;
+          bv = parseDate(bv) ? parseDate(bv).getTime() : Infinity;
+        } else { av = String(av); bv = String(bv); }
+        if (av < bv) return sortAsc ? -1 : 1;
+        if (av > bv) return sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function render(rows) {
+      tbody.innerHTML = rows.map((r, idx) => {
+        const left = daysUntil(r["유효기간"]);
+        const expClass = (left !== null && left <= 30) ? 'expiring' : '';
+        const dText = left === null ? '—' : (left >= 0 ? 'D-' + left : '만료');
+        return `
+          <tr class="${expClass}">
+            <td><strong>${r["번호"]}</strong></td>
+            <td>${escapeHtml(r["약품명"])}</td>
+            <td><code>${escapeHtml(r["약품코드"])}</code></td>
+            <td>
+              <input type="date" value="${escapeAttr(r["유효기간"])}" data-no="${r["번호"]}" />
+            </td>
+            <td>${dText}</td>
+          </tr>`;
+      }).join('');
+      // attach listeners
+      tbody.querySelectorAll('input[type="date"]').forEach(input => {
+        input.addEventListener('change', onDateChange);
+      });
+      count.textContent = rows.length + '개';
+    }
+
+    function escapeAttr(s) { return String(s ?? '').replace(/"/g,'&quot;'); }
+
+    function onDateChange(e) {
+      const no = Number(e.target.getAttribute('data-no'));
+      const val = e.target.value; // YYYY-MM-DD or ''
+      const idx = DATA.findIndex(x => Number(x["번호"]) === no);
+      if (idx >= 0) {
+        DATA[idx]["유효기간"] = val;
+        saveLocal();
+        update(); // 재계산(D-Day, 임박 등)
+      }
+    }
+
+    function update() {
+      let rows = filterRows(q.value);
+      rows = sortRows(rows);
+      render(rows);
+      hint.textContent = q.value ? '검색 결과' : (expOnly30 ? '유효기간 30일 이내만 표시' : '검색어를 입력하거나 유효기간을 직접 수정하세요');
+    }
+
+    // Export CSV (UTF-8 BOM for Excel compatibility)
+    function toCsv(rows) {
+      const header = ['번호','약품명','약품코드','유효기간'];
+      const escape = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+      const body = rows.map(r => [r['번호'], r['약품명'], r['약품코드'], r['유효기간']].map(escape).join(','));
+      return [header.join(','), ...body].join('\r\n');
+    }
+    function downloadCsv() {
+      const csv = '\ufeff' + toCsv(DATA);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '약품_유효기간_저장.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Import CSV (번호,약품명,약품코드,유효기간)
+    function parseCsv(text) {
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      if (!lines.length) return [];
+      const header = lines[0].split(',').map(s=>s.replace(/^\"|\"$/g,''));
+      const idxNo = header.indexOf('번호');
+      const idxName = header.indexOf('약품명');
+      const idxCode = header.indexOf('약품코드');
+      const idxExp = header.indexOf('유효기간');
+      const out = [];
+      for (let i=1;i<lines.length;i++) {
+        const cols = splitCsvLine(lines[i]);
+        const rec = {
+          '번호': Number(cols[idxNo]),
+          '약품명': cols[idxName],
+          '약품코드': cols[idxCode],
+          '유효기간': cols[idxExp] || ''
+        };
+        out.push(rec);
+      }
+      return out;
+    }
+    function splitCsvLine(line) {
+      const out = []; let cur=''; let inQ=false;
+      for (let i=0;i<line.length;i++) {
+        const ch = line[i];
+        if (ch==='"') {
+          if (inQ && line[i+1]==='"') { cur+='"'; i++; }
+          else { inQ = !inQ; }
+        } else if (ch===',' && !inQ) { out.push(cur); cur=''; }
+        else { cur+=ch; }
+      }
+      out.push(cur);
+      return out;
+    }
+
+    // Wire buttons
+    sortNoBtn.addEventListener('click', () => { sortKey='번호'; sortAsc=true; update(); });
+    sortNameBtn.addEventListener('click', () => { sortKey='약품명'; sortAsc=true; update(); });
+    sortExpBtn.addEventListener('click', () => { sortKey='유효기간'; sortAsc=true; update(); });
+    filterExp30Btn.addEventListener('click', () => { expOnly30 = !expOnly30; filterExp30Btn.style.fontWeight = expOnly30 ? '700' : '400'; update(); });
+    exportCsvBtn.addEventListener('click', downloadCsv);
+    importCsvInput.addEventListener('change', e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const rows = parseCsv(reader.result);
+          // Merge by 번호 (keep name/code, update expiry)
+          const map = new Map(DATA.map(r => [Number(r['번호']), r]));
+          rows.forEach(r => {
+            const rec = map.get(Number(r['번호']));
+            if (rec) rec['유효기간'] = r['유효기간'];
+          });
+          saveLocal();
+          update();
+          alert('CSV 불러오기 완료: 유효기간이 반영되었습니다.');
+        } catch (e) {
+          alert('CSV 형식을 확인해주세요.');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+    clearLocalBtn.addEventListener('click', () => {
+      if (!confirm('내 수정내용(로컬 저장소)을 초기화할까요?')) return;
+      localStorage.removeItem(LS_KEY);
+      DATA = ORIGIN_DATA.slice();
+      update();
+    });
+
+    q.addEventListener('input', update);
+
+    // 초기 렌더
+    update();
+  </script>
+</body>
+</html>
