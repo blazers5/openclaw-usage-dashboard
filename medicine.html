@@ -59,6 +59,16 @@
       .footer{font-size:11px}
     }
 
+    .float-wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,760px);max-height:80vh;z-index:30;background:#fff;border:1px solid #dbe2f0;border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.2);display:none}
+    .float-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef2f8;background:#f7f9ff}
+    .float-body{padding:10px 12px;overflow:auto;max-height:calc(80vh - 48px)}
+    .drug-list{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:8px}
+    .drug-list li{border:1px solid #e9edf5;border-radius:10px;padding:9px;background:#fcfdff}
+    .drug-list a{color:#0b57d0;text-decoration:none}
+    .drug-list a:hover{text-decoration:underline}
+    .drug-snippet{display:block;color:#4b5563;font-size:12px;margin-top:4px;line-height:1.4}
+    .drug-actions{display:flex;justify-content:flex-end;margin-top:8px}
+
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
     .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
     .modal h3{margin:0 0 10px;font-size:16px}
@@ -99,13 +109,18 @@
   <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
 
-<div id="drugFloat" class="float-wrap">
+<div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
   <div class="float-head">
     <b id="drugFloatTitle">약품 정보</b>
     <button id="drugFloatClose">닫기</button>
   </div>
   <div class="float-body">
-    <iframe id="drugFloatFrame" title="drug-info"></iframe>
+    <div id="drugFloatLoading" class="muted">검색 중...</div>
+    <div id="drugFloatError" class="muted err" style="display:none"></div>
+    <ul id="drugFloatList" class="drug-list"></ul>
+    <div class="drug-actions">
+      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">네이버 원문 열기</a>
+    </div>
   </div>
 </div>
 
@@ -140,10 +155,14 @@ const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
+const NAVER_PROXY_ENDPOINT = '/api/naver-search';
 const drugFloat = document.getElementById('drugFloat');
-const drugFloatFrame = document.getElementById('drugFloatFrame');
 const drugFloatTitle = document.getElementById('drugFloatTitle');
 const drugFloatClose = document.getElementById('drugFloatClose');
+const drugFloatLoading = document.getElementById('drugFloatLoading');
+const drugFloatError = document.getElementById('drugFloatError');
+const drugFloatList = document.getElementById('drugFloatList');
+const drugFloatOpenNaver = document.getElementById('drugFloatOpenNaver');
 
 function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -186,18 +205,52 @@ function rowView(r){
     </tr>`;
 }
 
-function openDrugInfo(name){
+function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+function renderDrugResults(items){
+  if(!Array.isArray(items) || items.length === 0){
+    drugFloatList.innerHTML = '<li class="muted">검색 결과가 없습니다.</li>';
+    return;
+  }
+  drugFloatList.innerHTML = items.map(item => {
+    const title = esc(stripHtml(item.title || '제목 없음'));
+    const link = esc(item.link || '#');
+    const snippet = esc(stripHtml(item.snippet || item.description || ''));
+    return `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>${snippet ? `<span class="drug-snippet">${snippet}</span>` : ''}</li>`;
+  }).join('');
+}
+
+async function openDrugInfo(name){
   const qText = nfc(name);
   const q = encodeURIComponent(qText);
-  const url = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
   drugFloatTitle.textContent = `약품 정보: ${qText}`;
-  drugFloatFrame.src = url;
+  drugFloatOpenNaver.href = naverUrl;
   drugFloat.style.display = 'block';
+  drugFloatLoading.style.display = 'block';
+  drugFloatError.style.display = 'none';
+  drugFloatList.innerHTML = '';
+
+  try {
+    const res = await fetch(`${NAVER_PROXY_ENDPOINT}?q=${q}`);
+    if(!res.ok){ throw new Error(`HTTP ${res.status}`); }
+    const json = await res.json();
+    renderDrugResults(json.results || []);
+  } catch (err) {
+    drugFloatError.textContent = '프록시 검색 실패: 원문 열기로 확인해주세요.';
+    drugFloatError.style.display = 'block';
+    drugFloatList.innerHTML = '<li class="muted">지금은 네이버 원문 열기만 사용할 수 있습니다.</li>';
+  } finally {
+    drugFloatLoading.style.display = 'none';
+  }
 }
 
 function closeDrugInfo(){
   drugFloat.style.display = 'none';
-  drugFloatFrame.src = 'about:blank';
+  drugFloatLoading.style.display = 'none';
+  drugFloatError.style.display = 'none';
+  drugFloatList.innerHTML = '';
+  drugFloatOpenNaver.removeAttribute('href');
 }
 
 function render(){
