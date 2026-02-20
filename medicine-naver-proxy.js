@@ -1,86 +1,80 @@
-// Simple Naver search proxy for medicine floating window
-// Run: node medicine-naver-proxy.js
+// Naver official search API proxy for medicine floating window
+// Run: NAVER_CLIENT_ID=... NAVER_CLIENT_SECRET=... node medicine-naver-proxy.js
 // Endpoint: GET /api/naver-search?q=<keyword>
 
 const http = require('http');
 const { URL } = require('url');
 
-const PORT = process.env.PORT || 8787;
+const PORT = Number(process.env.PORT || 8787);
+const CLIENT_ID = process.env.NAVER_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET || '';
 
 function stripHtml(text = '') {
   return String(text).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function decodeHtmlEntities(text = '') {
-  return text
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>');
+function json(res, code, body) {
+  res.writeHead(code, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
+  res.end(JSON.stringify(body));
 }
 
-function parseSearchResults(html) {
-  const out = [];
-  const blocks = html.match(/<a[^>]+href="https?:\/\/[^\"]+"[^>]*class="[^"]*link_tit[^"]*"[^>]*>[\s\S]*?<\/a>/g) || [];
+async function searchNaver(query) {
+  const url = `https://openapi.naver.com/v1/search/webkr.json?query=${encodeURIComponent(query)}&display=8&sort=sim`;
+  const res = await fetch(url, {
+    headers: {
+      'X-Naver-Client-Id': CLIENT_ID,
+      'X-Naver-Client-Secret': CLIENT_SECRET
+    }
+  });
 
-  for (const block of blocks.slice(0, 8)) {
-    const hrefMatch = block.match(/href="([^"]+)"/i);
-    const titleMatch = block.match(/>([\s\S]*?)<\/a>/i);
-    if (!hrefMatch) continue;
-
-    out.push({
-      title: decodeHtmlEntities(stripHtml(titleMatch ? titleMatch[1] : '제목 없음')),
-      link: decodeHtmlEntities(hrefMatch[1]),
-      snippet: ''
-    });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`NAVER_API_${res.status}: ${text.slice(0, 300)}`);
   }
 
-  return out;
+  const data = await res.json();
+  return (data.items || []).map((item) => ({
+    title: stripHtml(item.title || '제목 없음'),
+    link: item.link || '',
+    snippet: stripHtml(item.description || '')
+  }));
 }
 
 async function handleSearch(reqUrl, res) {
   const q = (reqUrl.searchParams.get('q') || '').trim();
-  if (!q) {
-    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ error: 'q is required' }));
-    return;
+  if (!q) return json(res, 400, { error: 'q is required' });
+
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    return json(res, 503, { error: 'naver_api_credentials_missing' });
   }
 
-  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${encodeURIComponent(q)}`;
-
   try {
-    const upstream = await fetch(naverUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
-      }
-    });
-    const html = await upstream.text();
-    const results = parseSearchResults(html);
-
-    res.writeHead(200, {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'public, max-age=300'
-    });
-    res.end(JSON.stringify({ query: q, results }));
-  } catch (error) {
-    res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ error: 'proxy_fetch_failed', detail: error.message }));
+    const results = await searchNaver(q);
+    return json(res, 200, { query: q, results });
+  } catch (e) {
+    return json(res, 502, { error: 'naver_api_failed', detail: e.message });
   }
 }
 
 const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host}`);
 
-  if (reqUrl.pathname === '/api/naver-search' && req.method === 'GET') {
-    handleSearch(reqUrl, res);
-    return;
+  if (req.method === 'OPTIONS') return json(res, 200, { ok: true });
+  if (req.method === 'GET' && reqUrl.pathname === '/api/naver-search') {
+    return handleSearch(reqUrl, res);
   }
 
-  res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
-  res.end(JSON.stringify({ error: 'not_found' }));
+  return json(res, 404, { error: 'not_found' });
 });
 
 server.listen(PORT, () => {
   console.log(`[medicine-naver-proxy] listening on :${PORT}`);
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.log('[medicine-naver-proxy] WARNING: NAVER_CLIENT_ID / NAVER_CLIENT_SECRET missing');
+  }
 });
