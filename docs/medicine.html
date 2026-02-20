@@ -40,23 +40,22 @@
     @media (max-width: 900px){
       .top{display:grid;grid-template-columns:1fr auto auto;gap:6px}
       #q{grid-column:1 / -1}
-      .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-      table{width:100%;min-width:740px;border:1px solid #e7ebf3;background:#fff;table-layout:fixed}
+      .table-wrap{overflow-x:hidden}
+      table{width:100%;min-width:0;border:1px solid #e7ebf3;background:#fff;table-layout:fixed}
       thead{display:table-header-group}
       tbody{display:table-row-group}
       tr{display:table-row}
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      td:nth-child(4){overflow:visible}
       /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
-      th:nth-child(1), td:nth-child(1){width:30px;padding-right:2px}
+      th:nth-child(1), td:nth-child(1){width:28px;padding-right:2px}
       th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
-      th:nth-child(3), td:nth-child(3){width:118px; text-align:right; white-space:nowrap}
-      th:nth-child(4), td:nth-child(4){width:104px}
+      th:nth-child(3), td:nth-child(3){width:104px; text-align:right; white-space:nowrap}
+      th:nth-child(4), td:nth-child(4){width:56px}
       td[data-label]::before{content:none}
-      .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
-      .save-wrap{justify-content:flex-start;gap:4px;flex-wrap:nowrap}
-      .save-btn{min-width:46px;padding:6px 6px;font-size:11px}
+      .cell-input{min-width:58px;padding:6px 6px;font-size:12px}
+      .save-wrap{display:flex;flex-direction:column;justify-content:flex-start;gap:3px;align-items:stretch}
+      .save-btn{width:100%;min-width:0;padding:4px 4px;font-size:10px;line-height:1.1}
       .footer{font-size:11px}
     }
 
