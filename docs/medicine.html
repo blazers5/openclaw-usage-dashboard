@@ -209,17 +209,24 @@ function rowView(r){
 function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
 
 function parseJinaFallback(text){
-  const lines = String(text || '').split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+  const raw = String(text || '');
+  if(/SecurityCompromiseError|access to domain|blocked until|Too many domains|DDos attack/i.test(raw)){
+    return [];
+  }
+
+  const lines = raw.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
   const links = [];
   const seen = new Set();
   for(const line of lines){
-    const m = line.match(/https?:\/\/[^\s)]+/);
+    if(/\{\s*"data"\s*:/i.test(line)) continue; // 보안 차단 JSON 라인 제외
+    const m = line.match(/https?:\/\/[^\s)"']+/);
     if(!m) continue;
     const link = m[0];
-    if(!/google\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
+    if(!/^https?:\/\/(www\.)?google\.com\//i.test(link) && !/^https?:\/\/scholar\.google\.com\//i.test(link)) continue;
+    if(!/(\/search\?|\/scholar\?)/i.test(link)) continue;
     if(seen.has(link)) continue;
     seen.add(link);
-    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || link;
+    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || '구글 검색 결과';
     links.push({ title, link, snippet: '구글 검색 대체 경로 결과' });
     if(links.length >= 8) break;
   }
