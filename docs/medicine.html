@@ -99,6 +99,16 @@
   <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
 
+<div id="drugFloat" class="float-wrap">
+  <div class="float-head">
+    <b id="drugFloatTitle">약품 정보</b>
+    <button id="drugFloatClose">닫기</button>
+  </div>
+  <div class="float-body">
+    <iframe id="drugFloatFrame" title="drug-info"></iframe>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="pwModal">
   <div class="modal">
     <h3>관리자 로그인</h3>
@@ -130,6 +140,10 @@ const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
+const drugFloat = document.getElementById('drugFloat');
+const drugFloatFrame = document.getElementById('drugFloatFrame');
+const drugFloatTitle = document.getElementById('drugFloatTitle');
+const drugFloatClose = document.getElementById('drugFloatClose');
 
 function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -173,9 +187,17 @@ function rowView(r){
 }
 
 function openDrugInfo(name){
-  const q = encodeURIComponent(nfc(name));
-  const url = `https://search.naver.com/search.naver?where=nexearch&query=${q}`; 
-  window.open(url, 'drug_info_popup', 'width=1100,height=780,scrollbars=yes,resizable=yes');
+  const qText = nfc(name);
+  const q = encodeURIComponent(qText);
+  const url = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  drugFloatTitle.textContent = `약품 정보: ${qText}`;
+  drugFloatFrame.src = url;
+  drugFloat.style.display = 'block';
+}
+
+function closeDrugInfo(){
+  drugFloat.style.display = 'none';
+  drugFloatFrame.src = 'about:blank';
 }
 
 function render(){
@@ -307,6 +329,7 @@ document.getElementById('pwConfirm').addEventListener('click', ()=>{
 });
 pwInput.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter') document.getElementById('pwConfirm').click(); });
 pwModal.addEventListener('click', (ev)=>{ if(ev.target === pwModal) closePwModal(); });
+drugFloatClose.addEventListener('click', closeDrugInfo);
 
 setMode();
 loadData();
