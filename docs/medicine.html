@@ -48,14 +48,16 @@
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
-      th:nth-child(1), td:nth-child(1){width:28px;padding-right:2px}
+      th:nth-child(1), td:nth-child(1){width:40px;padding-right:2px}
       th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
-      th:nth-child(3), td:nth-child(3){width:104px; text-align:right; white-space:nowrap}
-      th:nth-child(4), td:nth-child(4){width:56px}
+      th:nth-child(3), td:nth-child(3){width:118px; text-align:right; white-space:nowrap}
+      th:nth-child(4), td:nth-child(4){width:52px}
       td[data-label]::before{content:none}
-      .cell-input{min-width:58px;padding:6px 6px;font-size:12px}
+      .cell-input{min-width:0;padding:6px 6px;font-size:12px}
+      td:nth-child(1) .cell-input{width:100%;padding:6px 4px;text-align:center}
+      td:nth-child(3) .cell-input{width:100%;padding:6px 4px;font-size:11px;text-align:center}
       .save-wrap{display:flex;flex-direction:column;justify-content:flex-start;gap:3px;align-items:stretch}
-      .save-btn{width:100%;min-width:0;padding:4px 4px;font-size:10px;line-height:1.1}
+      .save-btn{width:100%;min-width:0;padding:4px 3px;font-size:10px;line-height:1.1}
       .footer{font-size:11px}
     }
 
