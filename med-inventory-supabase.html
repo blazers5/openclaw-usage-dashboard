@@ -156,6 +156,7 @@ const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINT = '/api/naver-search';
+const NAVER_FALLBACK_PROXY = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
 const drugFloat = document.getElementById('drugFloat');
 const drugFloatTitle = document.getElementById('drugFloatTitle');
 const drugFloatClose = document.getElementById('drugFloatClose');
@@ -207,6 +208,24 @@ function rowView(r){
 
 function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
 
+function parseJinaFallback(text){
+  const lines = String(text || '').split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+  const links = [];
+  const seen = new Set();
+  for(const line of lines){
+    const m = line.match(/https?:\/\/[^\s)]+/);
+    if(!m) continue;
+    const link = m[0];
+    if(!/naver\.com|blog\.naver\.com|post\.naver\.com|kin\.naver\.com|news\.naver\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
+    if(seen.has(link)) continue;
+    seen.add(link);
+    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || link;
+    links.push({ title, link, snippet: '네이버 검색 대체 경로 결과' });
+    if(links.length >= 8) break;
+  }
+  return links;
+}
+
 function renderDrugResults(items){
   if(!Array.isArray(items) || items.length === 0){
     drugFloatList.innerHTML = '<li class="muted">검색 결과가 없습니다.</li>';
@@ -218,6 +237,20 @@ function renderDrugResults(items){
     const snippet = esc(stripHtml(item.snippet || item.description || ''));
     return `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>${snippet ? `<span class="drug-snippet">${snippet}</span>` : ''}</li>`;
   }).join('');
+}
+
+async function fetchProxyResults(q){
+  const res = await fetch(`${NAVER_PROXY_ENDPOINT}?q=${q}`);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return json.results || [];
+}
+
+async function fetchFallbackResults(q){
+  const res = await fetch(`${NAVER_FALLBACK_PROXY}${q}`);
+  if(!res.ok) throw new Error(`FALLBACK_HTTP ${res.status}`);
+  const text = await res.text();
+  return parseJinaFallback(text);
 }
 
 async function openDrugInfo(name){
@@ -232,14 +265,32 @@ async function openDrugInfo(name){
   drugFloatList.innerHTML = '';
 
   try {
-    const res = await fetch(`${NAVER_PROXY_ENDPOINT}?q=${q}`);
-    if(!res.ok){ throw new Error(`HTTP ${res.status}`); }
-    const json = await res.json();
-    renderDrugResults(json.results || []);
+    const results = await fetchProxyResults(q);
+    if(results.length > 0){
+      renderDrugResults(results);
+      return;
+    }
+    const fallback = await fetchFallbackResults(q);
+    renderDrugResults(fallback);
+    if(fallback.length){
+      drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
+      drugFloatError.style.display = 'block';
+    }
   } catch (err) {
-    drugFloatError.textContent = '프록시 검색 실패: 원문 열기로 확인해주세요.';
-    drugFloatError.style.display = 'block';
-    drugFloatList.innerHTML = '<li class="muted">지금은 네이버 원문 열기만 사용할 수 있습니다.</li>';
+    try {
+      const fallback = await fetchFallbackResults(q);
+      renderDrugResults(fallback);
+      if(fallback.length){
+        drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
+        drugFloatError.style.display = 'block';
+      } else {
+        throw new Error('fallback-empty');
+      }
+    } catch {
+      drugFloatError.textContent = '검색 결과를 가져오지 못했습니다. 원문 열기로 확인해주세요.';
+      drugFloatError.style.display = 'block';
+      drugFloatList.innerHTML = '<li class="muted">지금은 네이버 원문 열기만 사용할 수 있습니다.</li>';
+    }
   } finally {
     drugFloatLoading.style.display = 'none';
   }
