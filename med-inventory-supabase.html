@@ -173,9 +173,32 @@ function rowView(r){
 }
 
 function openDrugInfo(name){
-  const qn = encodeURIComponent(nfc(name));
-  const url = `https://www.health.kr/include/drug.asp?drugnm=${qn}`;
-  window.open(url, 'drug_info_popup', 'width=1100,height=780,scrollbars=yes,resizable=yes');
+  const q = nfc(name);
+  const popup = window.open('', 'drug_info_popup', 'width=1100,height=780,scrollbars=yes,resizable=yes');
+  if(!popup) return;
+
+  // 약학정보원 의약품 통합검색 (POST)
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://www.health.kr/searchDrug/search_total_result.asp';
+  form.target = 'drug_info_popup';
+  form.style.display = 'none';
+
+  const word = document.createElement('input');
+  word.type = 'hidden';
+  word.name = 'search_word';
+  word.value = q;
+  form.appendChild(word);
+
+  const flag = document.createElement('input');
+  flag.type = 'hidden';
+  flag.name = 'search_flag';
+  flag.value = 'all';
+  form.appendChild(flag);
+
+  document.body.appendChild(form);
+  form.submit();
+  form.remove();
 }
 
 function render(){
