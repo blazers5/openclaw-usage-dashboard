@@ -174,7 +174,7 @@ function rowView(r){
 
 function openDrugInfo(name){
   const q = encodeURIComponent(nfc(name));
-  const url = `https://search.naver.com/search.naver?where=nexearch&query=${q}%20약`; 
+  const url = `https://search.naver.com/search.naver?where=nexearch&query=${q}`; 
   window.open(url, 'drug_info_popup', 'width=1100,height=780,scrollbars=yes,resizable=yes');
 }
 
