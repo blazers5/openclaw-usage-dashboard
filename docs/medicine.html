@@ -171,6 +171,15 @@ const drugFloatOpenNaver = document.getElementById('drugFloatOpenNaver');
 
 function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function normalizeDateInput(v){
+  const s = nfc(v).replace(/\./g,'-').replace(/\//g,'-').replace(/\s+/g,'');
+  const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(!m) return s;
+  const yyyy = m[1];
+  const mm = m[2].padStart(2,'0');
+  const dd = m[3].padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 
 function setMode(){
@@ -200,7 +209,7 @@ function rowView(r){
         <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
-      <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
+      <td data-label="유효기간"><input class="cell-input" type="text" inputmode="numeric" placeholder="YYYY-MM-DD" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
       <td data-label="저장">
         <div class="save-wrap">
           <button class="save-btn" data-action="save">저장</button>
@@ -445,11 +454,12 @@ async function saveRow(e){
   const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
   const name = nfc(tr.querySelector('[data-field="name"]').value);
   const code = nfc(tr.querySelector('[data-field="code"]').value);
-  const expiry = nfc(tr.querySelector('[data-field="expiry_date"]').value);
+  const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
 
   if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
   if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
   if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+  if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('유효기간은 YYYY-MM-DD 형식으로 입력해주세요.'); return; }
 
   const payload = { no, name, code, expiry_date: expiry || null };
   const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
