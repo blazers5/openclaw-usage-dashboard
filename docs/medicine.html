@@ -290,21 +290,7 @@ function buildGuaranteedResults(q){
 }
 
 async function fetchFallbackResults(q){
-  const tries = [
-    `${NAVER_FALLBACK_PROXY}${q}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(`${NAVER_FALLBACK_PROXY}${q}`)}`
-  ];
-
-  for(const url of tries){
-    try {
-      const res = await fetch(url);
-      if(!res.ok) continue;
-      const text = await res.text();
-      const parsed = parseJinaFallback(text);
-      if(parsed.length) return parsed;
-    } catch {}
-  }
-
+  // 외부 우회 파싱은 차단/오탐 문자열 유입 위험이 있어 비활성화
   return buildGuaranteedResults(q);
 }
 
