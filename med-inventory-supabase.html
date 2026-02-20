@@ -6,104 +6,434 @@
   <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    *{box-sizing:border-box} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
-    .wrap{max-width:1100px;margin:0 auto}.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input,button{padding:10px;border:1px solid #ddd;border-radius:10px} input{font-size:16px}
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
+    .wrap{max-width:1200px;margin:0 auto}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:#f6f7fb;padding-top:6px;padding-bottom:6px}
+    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input,button{padding:10px;border:1px solid #ddd;border-radius:10px}
+    input{font-size:15px}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
-    th,td{padding:10px;border-bottom:1px solid #f1f1f1;text-align:left;font-size:14px}
-    .muted{color:#6b7280;font-size:12px}.pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
-    .row{margin-top:10px}.footer{margin-top:10px;color:#666;font-size:12px}
+    th,td{padding:9px 10px;border-bottom:1px solid #eef1f6;text-align:left;font-size:14px;vertical-align:middle;line-height:1.35}
+    .muted{color:#6b7280;font-size:12px}
+    .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
+    .row{margin-top:10px}
+    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    .footer{margin-top:10px;color:#666;font-size:12px}
+    .cell-input{width:100%;min-width:96px;padding:8px;font-size:13px}
+    .save-btn{padding:6px 10px;font-size:12px}
+    .save-wrap{display:flex;gap:6px;align-items:center}
+    .med-link{all:unset;color:#0b57d0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+    tbody tr:nth-child(odd){background:#fbfcff}
+    tbody tr:nth-child(even){background:#ffffff}
+    .ok{color:#0f766e}.err{color:#b91c1c}
+
+    @media (max-width: 768px){
+      h2{font-size:30px;margin-bottom:10px}
+      .top{display:grid;grid-template-columns:1fr auto;gap:8px}
+      #q{grid-column:1 / -1}
+      table{min-width:700px}
+      th,td{font-size:13px;padding:8px}
+      .save-btn{padding:9px 10px}
+    }
+
+    @media (max-width: 900px){
+      .top{display:grid;grid-template-columns:1fr auto auto;gap:6px}
+      #q{grid-column:1 / -1}
+      .table-wrap{overflow-x:hidden}
+      table{width:100%;min-width:0;border:1px solid #e7ebf3;background:#fff;table-layout:fixed}
+      thead{display:table-header-group}
+      tbody{display:table-row-group}
+      tr{display:table-row}
+      td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
+      th:nth-child(1), td:nth-child(1){width:30px;padding-right:2px}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
+      th:nth-child(3), td:nth-child(3){width:108px; text-align:right; white-space:nowrap}
+      th:nth-child(4), td:nth-child(4){width:66px}
+      td[data-label]::before{content:none}
+      .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
+      .save-wrap{justify-content:flex-start;gap:4px}
+      .save-btn{min-width:50px;padding:6px 7px;font-size:11px}
+      .footer{font-size:11px}
+    }
+
+    .float-wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,760px);max-height:80vh;z-index:30;background:#fff;border:1px solid #dbe2f0;border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.2);display:none}
+    .float-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef2f8;background:#f7f9ff}
+    .float-body{padding:10px 12px;overflow:auto;max-height:calc(80vh - 48px)}
+    .drug-list{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:8px}
+    .drug-list li{border:1px solid #e9edf5;border-radius:10px;padding:9px;background:#fcfdff}
+    .drug-list a{color:#0b57d0;text-decoration:none}
+    .drug-list a:hover{text-decoration:underline}
+    .drug-snippet{display:block;color:#4b5563;font-size:12px;margin-top:4px;line-height:1.4}
+    .drug-actions{display:flex;justify-content:flex-end;margin-top:8px}
+
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
+    .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
+    .modal h3{margin:0 0 10px;font-size:16px}
+    .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <h2>약품관리 시스템 (공유형)</h2>
-  <div class="top">
-    <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
-    <button id="adminLogin">관리자 로그인</button>
-    <button id="adminLogout" style="display:none">로그아웃</button>
-    <span id="mode" class="pill">조회 전용</span>
-    <button id="reload">새로고침</button>
+  <div class="sticky-tools">
+    <div class="top">
+      <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+      <button id="adminLogin">관리자 로그인</button>
+      <button id="adminLogout" style="display:none">로그아웃</button>
+      <button id="adminAddRow" style="display:none">행 추가</button>
+      <button id="adminClearAll" style="display:none">전체 삭제</button>
+      <span id="mode" class="pill">조회 전용</span>
+      <button id="reload">새로고침</button>
+    </div>
+
+    <div class="row muted" id="status">연결 중...</div>
   </div>
-  <div class="row muted" id="status">연결 중...</div>
-  <div class="row">
+
+  <div class="row table-wrap">
     <table>
-      <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th><th>D-Day</th></tr></thead>
+      <thead>
+        <tr>
+          <th style="width:64px">번호</th>
+          <th>약품명(코드)</th>
+          <th style="width:120px">유효기간</th>
+          <th style="width:72px">저장</th>
+        </tr>
+      </thead>
       <tbody id="tb"></tbody>
     </table>
   </div>
-  <div class="footer">기본 조회 전용 / 관리자 로그인 시 유효기간 편집 가능</div>
+
+  <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
+
+<div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
+  <div class="float-head">
+    <b id="drugFloatTitle">약품 정보</b>
+    <button id="drugFloatClose">닫기</button>
+  </div>
+  <div class="float-body">
+    <div id="drugFloatLoading" class="muted">검색 중...</div>
+    <div id="drugFloatError" class="muted err" style="display:none"></div>
+    <ul id="drugFloatList" class="drug-list"></ul>
+    <div class="drug-actions">
+      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">네이버 원문 열기</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="pwModal">
+  <div class="modal">
+    <h3>관리자 로그인</h3>
+    <input id="pwInput" type="password" placeholder="비밀번호 입력" style="width:100%" />
+    <div class="actions">
+      <button id="pwCancel">취소</button>
+      <button id="pwConfirm">로그인</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://lkcugkmkabeeeigkazzn.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_27Iqc8Qukobl8cK0PGUwzQ_HM5Gzw3n';
 const ADMIN_PASSWORD = 'qwer1234';
 const ADMIN_SESSION_KEY = 'med-admin-session-v1';
+
 let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
 let rows = [];
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const tb = document.getElementById('tb');
 const q = document.getElementById('q');
 const statusEl = document.getElementById('status');
 const modeEl = document.getElementById('mode');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
+const adminAddRowBtn = document.getElementById('adminAddRow');
+const adminClearAllBtn = document.getElementById('adminClearAll');
+const pwModal = document.getElementById('pwModal');
+const pwInput = document.getElementById('pwInput');
+const NAVER_PROXY_ENDPOINT = '/api/naver-search';
+const NAVER_FALLBACK_PROXY = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
+const drugFloat = document.getElementById('drugFloat');
+const drugFloatTitle = document.getElementById('drugFloatTitle');
+const drugFloatClose = document.getElementById('drugFloatClose');
+const drugFloatLoading = document.getElementById('drugFloatLoading');
+const drugFloatError = document.getElementById('drugFloatError');
+const drugFloatList = document.getElementById('drugFloatList');
+const drugFloatOpenNaver = document.getElementById('drugFloatOpenNaver');
 
 function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
-function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 
 function setMode(){
   modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
   loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
   logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  adminAddRowBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  adminClearAllBtn.style.display = isAdmin ? 'inline-block' : 'none';
+}
+
+function rowView(r){
+  if(!isAdmin){
+    return `
+      <tr data-id="${r.id}">
+        <td data-label="번호">${r.no}</td>
+        <td data-label="약품명"><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="유효기간">${r.expiry_date || '—'}</td>
+        <td data-label="저장" class="muted">-</td>
+      </tr>`;
+  }
+
+  return `
+    <tr data-id="${r.id}">
+      <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
+      <td data-label="약품명">
+        <span>${esc(r.name)}</span>
+        <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
+        <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
+      </td>
+      <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
+      <td data-label="저장">
+        <div class="save-wrap">
+          <button class="save-btn" data-action="save">저장</button>
+          <button class="save-btn" data-action="delete">삭제</button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+function parseJinaFallback(text){
+  const lines = String(text || '').split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+  const links = [];
+  const seen = new Set();
+  for(const line of lines){
+    const m = line.match(/https?:\/\/[^\s)]+/);
+    if(!m) continue;
+    const link = m[0];
+    if(!/naver\.com|blog\.naver\.com|post\.naver\.com|kin\.naver\.com|news\.naver\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
+    if(seen.has(link)) continue;
+    seen.add(link);
+    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || link;
+    links.push({ title, link, snippet: '네이버 검색 대체 경로 결과' });
+    if(links.length >= 8) break;
+  }
+  return links;
+}
+
+function renderDrugResults(items){
+  if(!Array.isArray(items) || items.length === 0){
+    drugFloatList.innerHTML = '<li class="muted">검색 결과가 없습니다.</li>';
+    return;
+  }
+  drugFloatList.innerHTML = items.map(item => {
+    const title = esc(stripHtml(item.title || '제목 없음'));
+    const link = esc(item.link || '#');
+    const snippet = esc(stripHtml(item.snippet || item.description || ''));
+    return `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>${snippet ? `<span class="drug-snippet">${snippet}</span>` : ''}</li>`;
+  }).join('');
+}
+
+async function fetchProxyResults(q){
+  const res = await fetch(`${NAVER_PROXY_ENDPOINT}?q=${q}`);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return json.results || [];
+}
+
+async function fetchFallbackResults(q){
+  const res = await fetch(`${NAVER_FALLBACK_PROXY}${q}`);
+  if(!res.ok) throw new Error(`FALLBACK_HTTP ${res.status}`);
+  const text = await res.text();
+  return parseJinaFallback(text);
+}
+
+async function openDrugInfo(name){
+  const qText = nfc(name);
+  const q = encodeURIComponent(qText);
+  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  drugFloatTitle.textContent = `약품 정보: ${qText}`;
+  drugFloatOpenNaver.href = naverUrl;
+  drugFloat.style.display = 'block';
+  drugFloatLoading.style.display = 'block';
+  drugFloatError.style.display = 'none';
+  drugFloatList.innerHTML = '';
+
+  try {
+    const results = await fetchProxyResults(q);
+    if(results.length > 0){
+      renderDrugResults(results);
+      return;
+    }
+    const fallback = await fetchFallbackResults(q);
+    renderDrugResults(fallback);
+    if(fallback.length){
+      drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
+      drugFloatError.style.display = 'block';
+    }
+  } catch (err) {
+    try {
+      const fallback = await fetchFallbackResults(q);
+      renderDrugResults(fallback);
+      if(fallback.length){
+        drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
+        drugFloatError.style.display = 'block';
+      } else {
+        throw new Error('fallback-empty');
+      }
+    } catch {
+      drugFloatError.textContent = '검색 결과를 가져오지 못했습니다. 원문 열기로 확인해주세요.';
+      drugFloatError.style.display = 'block';
+      drugFloatList.innerHTML = '<li class="muted">지금은 네이버 원문 열기만 사용할 수 있습니다.</li>';
+    }
+  } finally {
+    drugFloatLoading.style.display = 'none';
+  }
+}
+
+function closeDrugInfo(){
+  drugFloat.style.display = 'none';
+  drugFloatLoading.style.display = 'none';
+  drugFloatError.style.display = 'none';
+  drugFloatList.innerHTML = '';
+  drugFloatOpenNaver.removeAttribute('href');
 }
 
 function render(){
   const k = nfc(q.value).toLowerCase();
   const filtered = rows.filter(r => !k || String(r.no).includes(k) || nfc(r.name).toLowerCase().includes(k) || nfc(r.code).toLowerCase().includes(k));
-  tb.innerHTML = filtered.map(r => `
-    <tr>
-      <td>${r.no}</td>
-      <td>${esc(r.name)}</td>
-      <td><code>${esc(r.code)}</code></td>
-      <td><input type="date" data-id="${r.id}" value="${esc(r.expiry_date || '')}" ${isAdmin?'':'disabled'} /></td>
-      <td>${dday(r.expiry_date)}</td>
-    </tr>`).join('');
-  tb.querySelectorAll('input[type="date"]').forEach(el=>el.addEventListener('change', onEdit));
+  tb.innerHTML = filtered.map(rowView).join('');
+  tb.querySelectorAll('.med-link').forEach(btn => btn.addEventListener('click', () => openDrugInfo(btn.dataset.name || '')));
+  tb.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
+  tb.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
 }
 
 async function loadData(){
   statusEl.textContent = '데이터 불러오는 중...';
-  const {data, error} = await db.from('medicine_inventory').select('*').order('no', {ascending:true});
-  if(error){ statusEl.textContent = '불러오기 실패: '+error.message; return; }
-  rows = (data||[]).map(r=>({
-    id:r.id, no:r.no, name:nfc(r.name), code:nfc(r.code), expiry_date:r.expiry_date ? nfc(r.expiry_date) : ''
+  const { data, error } = await db.from('medicine_inventory').select('*').order('no', {ascending:true});
+  if(error){ statusEl.textContent = '불러오기 실패: ' + error.message; statusEl.className='row muted err'; return; }
+  rows = (data||[]).map(r => ({
+    id: r.id,
+    no: Number(r.no),
+    name: nfc(r.name),
+    code: nfc(r.code),
+    expiry_date: r.expiry_date ? nfc(r.expiry_date) : ''
   }));
   statusEl.textContent = `총 ${rows.length}건 로드 완료`;
+  statusEl.className='row muted ok';
   render();
 }
 
-async function onEdit(e){
-  if(!isAdmin){ alert('관리자 로그인 후 수정 가능'); return; }
-  const id = e.target.dataset.id;
-  const expiry = nfc(e.target.value);
-  const { error } = await db.from('medicine_inventory').update({ expiry_date: expiry || null }).eq('id', id);
-  if(error){ alert('저장 실패: '+error.message); return; }
-  const idx = rows.findIndex(x=>String(x.id)===String(id));
-  if(idx>=0) rows[idx].expiry_date = expiry;
+async function deleteRow(e){
+  if(!confirm('이 행을 삭제할까요?')) return;
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const { error } = await db.from('medicine_inventory').delete().eq('id', id);
+  if(error){
+    alert('삭제 실패: ' + error.message + '\n\n(삭제 정책이 없을 수 있어. 내가 바로 SQL 한 줄 줄게.)');
+    return;
+  }
+  rows = rows.filter(x => String(x.id) !== String(id));
+  statusEl.textContent = `삭제 완료 (ID ${id})`;
+  statusEl.className='row muted ok';
   render();
 }
+
+async function clearAllRows(){
+  if(!confirm('정말 전체 약품 데이터를 삭제할까요? 되돌릴 수 없습니다.')) return;
+  const { error } = await db.from('medicine_inventory').delete().gt('id', 0);
+  if(error){
+    alert('전체 삭제 실패: ' + error.message + '\n\n(삭제 정책 SQL 적용이 필요할 수 있어.)');
+    return;
+  }
+  rows = [];
+  statusEl.textContent = '전체 삭제 완료';
+  statusEl.className='row muted ok';
+  render();
+}
+
+async function addRow(){
+  const maxNo = rows.reduce((m,r)=>Math.max(m, Number(r.no)||0), 0);
+  const noInput = prompt('새 번호 입력', String(maxNo + 1));
+  if(noInput === null) return;
+  const no = Number(nfc(noInput));
+  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자여야 합니다.'); return; }
+  const name = nfc(prompt('약품명 입력', '신규 약품') || '');
+  if(!name){ alert('약품명을 입력해야 합니다.'); return; }
+  const code = nfc(prompt('약품코드 입력', 'new_code') || '');
+  if(!code){ alert('약품코드를 입력해야 합니다.'); return; }
+
+  const payload = { no, name, code, expiry_date: null };
+  const { data, error } = await db.from('medicine_inventory').insert(payload).select('*').single();
+  if(error){ alert('행 추가 실패: ' + error.message); return; }
+
+  rows.push({
+    id: data.id,
+    no: Number(data.no),
+    name: nfc(data.name),
+    code: nfc(data.code),
+    expiry_date: data.expiry_date ? nfc(data.expiry_date) : ''
+  });
+  rows.sort((a,b)=>a.no-b.no);
+  statusEl.textContent = `행 추가 완료 (ID ${data.id})`;
+  statusEl.className='row muted ok';
+  render();
+}
+
+async function saveRow(e){
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
+  const name = nfc(tr.querySelector('[data-field="name"]').value);
+  const code = nfc(tr.querySelector('[data-field="code"]').value);
+  const expiry = nfc(tr.querySelector('[data-field="expiry_date"]').value);
+
+  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
+  if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
+  if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+
+  const payload = { no, name, code, expiry_date: expiry || null };
+  const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
+  if(error){ alert('저장 실패: ' + error.message); return; }
+
+  const idx = rows.findIndex(x => String(x.id) === String(id));
+  if(idx >= 0){ rows[idx] = { ...rows[idx], ...payload, expiry_date: expiry }; }
+
+  statusEl.textContent = `저장 완료 (ID ${id})`;
+  statusEl.className='row muted ok';
+  render();
+}
+
+function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
+function closePwModal(){ pwModal.style.display='none'; }
 
 q.addEventListener('input', render);
-loginBtn.addEventListener('click', ()=>{
-  const p = prompt('관리자 비밀번호 입력');
-  if(p===null) return;
-  if(nfc(p)===ADMIN_PASSWORD){ isAdmin=true; sessionStorage.setItem(ADMIN_SESSION_KEY,'1'); setMode(); render(); }
-  else alert('비밀번호 불일치');
-});
+loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
+adminAddRowBtn.addEventListener('click', addRow);
+adminClearAllBtn.addEventListener('click', clearAllRows);
+
+document.getElementById('pwCancel').addEventListener('click', closePwModal);
+document.getElementById('pwConfirm').addEventListener('click', ()=>{
+  if(nfc(pwInput.value) === ADMIN_PASSWORD){
+    isAdmin = true;
+    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+    setMode();
+    closePwModal();
+    render();
+  } else {
+    alert('비밀번호가 올바르지 않습니다.');
+  }
+});
+pwInput.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter') document.getElementById('pwConfirm').click(); });
+pwModal.addEventListener('click', (ev)=>{ if(ev.target === pwModal) closePwModal(); });
+drugFloatClose.addEventListener('click', closeDrugInfo);
 
 setMode();
 loadData();
