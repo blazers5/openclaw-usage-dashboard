@@ -235,6 +235,20 @@ function parseJinaFallback(text){
   return links;
 }
 
+function sanitizeResults(items, q){
+  const badRe = /SecurityCompromiseError|blocked until|Too many domains|DDos|Anonymous access|\{\s*"?data"?\s*:/i;
+  const safe = (Array.isArray(items) ? items : []).filter(item => {
+    const title = stripHtml(item?.title || '');
+    const snippet = stripHtml(item?.snippet || item?.description || '');
+    const link = String(item?.link || '');
+    if(!/^https?:\/\//i.test(link)) return false;
+    if(badRe.test(title) || badRe.test(snippet)) return false;
+    if(title.trim().startsWith('{') || snippet.trim().startsWith('{')) return false;
+    return true;
+  });
+  return safe.length ? safe : buildGuaranteedResults(q);
+}
+
 function renderDrugResults(items){
   if(!Array.isArray(items) || items.length === 0){
     drugFloatList.innerHTML = '<li class="muted">검색 결과가 없습니다.</li>';
@@ -306,12 +320,12 @@ async function openDrugInfo(name){
   drugFloatList.innerHTML = '';
 
   try {
-    const results = await fetchProxyResults(q);
+    const results = sanitizeResults(await fetchProxyResults(q), q);
     if(results.length > 0){
       renderDrugResults(results);
       return;
     }
-    const fallback = await fetchFallbackResults(q);
+    const fallback = sanitizeResults(await fetchFallbackResults(q), q);
     renderDrugResults(fallback);
     if(fallback.length){
       drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
@@ -319,7 +333,7 @@ async function openDrugInfo(name){
     }
   } catch (err) {
     try {
-      const fallback = await fetchFallbackResults(q);
+      const fallback = sanitizeResults(await fetchFallbackResults(q), q);
       renderDrugResults(fallback);
       if(fallback.length){
         drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
