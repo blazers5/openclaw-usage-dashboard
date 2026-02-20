@@ -158,7 +158,7 @@ function rowView(r){
     <tr data-id="${r.id}">
       <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
       <td data-label="약품명">
-        <button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button>
+        <span>${esc(r.name)}</span>
         <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
