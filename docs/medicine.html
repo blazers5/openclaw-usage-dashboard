@@ -9,6 +9,7 @@
     *{box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
     .wrap{max-width:1200px;margin:0 auto}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:#f6f7fb;padding-top:6px;padding-bottom:6px}
     .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     input,button{padding:10px;border:1px solid #ddd;border-radius:10px}
     input{font-size:15px}
@@ -22,6 +23,7 @@
     .cell-input{width:100%;min-width:96px;padding:8px;font-size:13px}
     .save-btn{padding:6px 10px;font-size:12px}
     .save-wrap{display:flex;gap:6px;align-items:center}
+    .med-link{all:unset;color:#0b57d0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
     tbody tr:nth-child(odd){background:#fbfcff}
     tbody tr:nth-child(even){background:#ffffff}
     .ok{color:#0f766e}.err{color:#b91c1c}
@@ -66,17 +68,19 @@
 <body>
 <div class="wrap">
   <h2>약품관리 시스템 (공유형)</h2>
-  <div class="top">
-    <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
-    <button id="adminLogin">관리자 로그인</button>
-    <button id="adminLogout" style="display:none">로그아웃</button>
-    <button id="adminAddRow" style="display:none">행 추가</button>
-    <button id="adminClearAll" style="display:none">전체 삭제</button>
-    <span id="mode" class="pill">조회 전용</span>
-    <button id="reload">새로고침</button>
-  </div>
+  <div class="sticky-tools">
+    <div class="top">
+      <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+      <button id="adminLogin">관리자 로그인</button>
+      <button id="adminLogout" style="display:none">로그아웃</button>
+      <button id="adminAddRow" style="display:none">행 추가</button>
+      <button id="adminClearAll" style="display:none">전체 삭제</button>
+      <span id="mode" class="pill">조회 전용</span>
+      <button id="reload">새로고침</button>
+    </div>
 
-  <div class="row muted" id="status">연결 중...</div>
+    <div class="row muted" id="status">연결 중...</div>
+  </div>
 
   <div class="row table-wrap">
     <table>
@@ -144,7 +148,7 @@ function rowView(r){
     return `
       <tr data-id="${r.id}">
         <td data-label="번호">${r.no}</td>
-        <td data-label="약품명">${esc(r.name)} <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="약품명"><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
         <td data-label="유효기간">${r.expiry_date || '—'}</td>
         <td data-label="저장" class="muted">-</td>
       </tr>`;
@@ -154,7 +158,8 @@ function rowView(r){
     <tr data-id="${r.id}">
       <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
       <td data-label="약품명">
-        <input class="cell-input" data-field="name" value="${esc(r.name)}" />
+        <button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button>
+        <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
       <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
@@ -167,10 +172,17 @@ function rowView(r){
     </tr>`;
 }
 
+function openDrugInfo(name){
+  const qn = encodeURIComponent(nfc(name));
+  const url = `https://www.health.kr/include/drug.asp?drugnm=${qn}`;
+  window.open(url, 'drug_info_popup', 'width=1100,height=780,scrollbars=yes,resizable=yes');
+}
+
 function render(){
   const k = nfc(q.value).toLowerCase();
   const filtered = rows.filter(r => !k || String(r.no).includes(k) || nfc(r.name).toLowerCase().includes(k) || nfc(r.code).toLowerCase().includes(k));
   tb.innerHTML = filtered.map(rowView).join('');
+  tb.querySelectorAll('.med-link').forEach(btn => btn.addEventListener('click', () => openDrugInfo(btn.dataset.name || '')));
   tb.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
   tb.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
 }
