@@ -119,7 +119,7 @@
     <div id="drugFloatError" class="muted err" style="display:none"></div>
     <ul id="drugFloatList" class="drug-list"></ul>
     <div class="drug-actions">
-      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">네이버 원문 열기</a>
+      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">구글 원문 열기</a>
     </div>
   </div>
 </div>
@@ -156,7 +156,7 @@ const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINT = '/api/naver-search';
-const NAVER_FALLBACK_PROXY = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
+const NAVER_FALLBACK_PROXY = 'https://r.jina.ai/http://www.google.com/search?q=';
 const drugFloat = document.getElementById('drugFloat');
 const drugFloatTitle = document.getElementById('drugFloatTitle');
 const drugFloatClose = document.getElementById('drugFloatClose');
@@ -216,11 +216,11 @@ function parseJinaFallback(text){
     const m = line.match(/https?:\/\/[^\s)]+/);
     if(!m) continue;
     const link = m[0];
-    if(!/naver\.com|blog\.naver\.com|post\.naver\.com|kin\.naver\.com|news\.naver\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
+    if(!/google\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
     if(seen.has(link)) continue;
     seen.add(link);
     const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || link;
-    links.push({ title, link, snippet: '네이버 검색 대체 경로 결과' });
+    links.push({ title, link, snippet: '구글 검색 대체 경로 결과' });
     if(links.length >= 8) break;
   }
   return links;
@@ -256,7 +256,7 @@ async function fetchFallbackResults(q){
 async function openDrugInfo(name){
   const qText = nfc(name);
   const q = encodeURIComponent(qText);
-  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  const naverUrl = `https://www.google.com/search?q=${q}`;
   drugFloatTitle.textContent = `약품 정보: ${qText}`;
   drugFloatOpenNaver.href = naverUrl;
   drugFloat.style.display = 'block';
