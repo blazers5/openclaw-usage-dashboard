@@ -158,9 +158,9 @@ const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
-  '/api/naver-search',
-  'https://fbd5f19575404f.lhr.life/api/naver-search'
+  '/api/naver-search'
 ];
+const NAVER_READABLE_SEARCH = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
 const drugFloat = document.getElementById('drugFloat');
 const drugFloatTitle = document.getElementById('drugFloatTitle');
 const drugFloatClose = document.getElementById('drugFloatClose');
@@ -222,29 +222,25 @@ function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').rep
 
 function parseJinaFallback(text){
   const raw = String(text || '');
-  if(/SecurityCompromiseError|access to domain|blocked until|Too many domains|DDos attack/i.test(raw)){
-    return [];
+  const out = [];
+  const seen = new Set();
+
+  // r.jina.ai가 반환한 markdown 링크 파싱: [제목](URL)
+  const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+  let m;
+  while((m = re.exec(raw)) !== null){
+    const title = stripHtml(m[1] || '').trim();
+    const link = m[2] || '';
+    if(!title || !link) continue;
+    if(/search\.naver\.com\/search\.naver/i.test(link)) continue;
+    if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(link)) continue;
+    if(seen.has(link)) continue;
+    seen.add(link);
+    out.push({ title, link, snippet: '네이버 검색 결과' });
+    if(out.length >= 8) break;
   }
 
-  const lines = raw.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
-  const links = [];
-  const seen = new Set();
-  for(const line of lines){
-    if(/\{\s*"data"\s*:/i.test(line)) continue; // 보안 차단 JSON 라인 제외
-    if(/SecurityCompromiseError|blocked until|Too many domains|Anonymous access|DDos attack|previous abuse/i.test(line)) continue;
-    const m = line.match(/https?:\/\/[^\s)"']+/);
-    if(!m) continue;
-    const link = m[0];
-    if(!/^https?:\/\/(www\.)?google\.com\//i.test(link) && !/^https?:\/\/scholar\.google\.com\//i.test(link)) continue;
-    if(!/(\/search\?|\/scholar\?)/i.test(link)) continue;
-    if(seen.has(link)) continue;
-    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || '구글 검색 결과';
-    if(/SecurityCompromiseError|blocked until|Too many domains|Anonymous access|DDos attack|previous abuse/i.test(title)) continue;
-    seen.add(link);
-    links.push({ title, link, snippet: '구글 검색 대체 경로 결과' });
-    if(links.length >= 8) break;
-  }
-  return links;
+  return out;
 }
 
 function sanitizeResults(items, q){
@@ -310,7 +306,13 @@ function buildGuaranteedResults(q){
 }
 
 async function fetchFallbackResults(q){
-  // 외부 우회 파싱은 차단/오탐 문자열 유입 위험이 있어 비활성화
+  try {
+    const res = await fetch(`${NAVER_READABLE_SEARCH}${q}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = parseJinaFallback(text);
+    if(parsed.length) return parsed;
+  } catch {}
   return buildGuaranteedResults(q);
 }
 
