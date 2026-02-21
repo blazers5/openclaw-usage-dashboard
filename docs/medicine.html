@@ -86,7 +86,6 @@
       <button id="adminLogin">관리자 로그인</button>
       <button id="adminLogout" style="display:none">로그아웃</button>
       <button id="adminAddRow" style="display:none">행 추가</button>
-      <button id="adminClearAll" style="display:none">전체 삭제</button>
       <span id="mode" class="pill">조회 전용</span>
       <button id="reload">새로고침</button>
     </div>
@@ -154,7 +153,6 @@ const modeEl = document.getElementById('mode');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
 const adminAddRowBtn = document.getElementById('adminAddRow');
-const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
@@ -187,7 +185,6 @@ function setMode(){
   loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
   logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
   adminAddRowBtn.style.display = isAdmin ? 'inline-block' : 'none';
-  adminClearAllBtn.style.display = isAdmin ? 'inline-block' : 'none';
 }
 
 function rowView(r){
@@ -205,7 +202,6 @@ function rowView(r){
     <tr data-id="${r.id}">
       <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
       <td data-label="약품명">
-        <span>${esc(r.name)}</span>
         <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
@@ -395,31 +391,29 @@ async function loadData(){
 }
 
 async function deleteRow(e){
+  const btn = e.target;
+  const prevText = btn.textContent;
   if(!confirm('이 행을 삭제할까요?')) return;
-  const tr = e.target.closest('tr');
-  const id = tr.dataset.id;
-  const { error } = await db.from('medicine_inventory').delete().eq('id', id);
-  if(error){
-    alert('삭제 실패: ' + error.message + '\n\n(삭제 정책이 없을 수 있어. 내가 바로 SQL 한 줄 줄게.)');
-    return;
-  }
-  rows = rows.filter(x => String(x.id) !== String(id));
-  statusEl.textContent = `삭제 완료 (ID ${id})`;
-  statusEl.className='row muted ok';
-  render();
-}
 
-async function clearAllRows(){
-  if(!confirm('정말 전체 약품 데이터를 삭제할까요? 되돌릴 수 없습니다.')) return;
-  const { error } = await db.from('medicine_inventory').delete().gt('id', 0);
-  if(error){
-    alert('전체 삭제 실패: ' + error.message + '\n\n(삭제 정책 SQL 적용이 필요할 수 있어.)');
-    return;
+  btn.disabled = true;
+  btn.textContent = '삭제중';
+
+  try {
+    const tr = e.target.closest('tr');
+    const id = tr.dataset.id;
+    const { error } = await db.from('medicine_inventory').delete().eq('id', id);
+    if(error){
+      alert('삭제 실패: ' + error.message + '\n\n(삭제 정책이 없을 수 있어. 제가 바로 SQL 한 줄 드리겠습니다.)');
+      return;
+    }
+    rows = rows.filter(x => String(x.id) !== String(id));
+    statusEl.textContent = `삭제 완료 (ID ${id})`;
+    statusEl.className='row muted ok';
+    render();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
   }
-  rows = [];
-  statusEl.textContent = '전체 삭제 완료';
-  statusEl.className='row muted ok';
-  render();
 }
 
 async function addRow(){
@@ -451,28 +445,38 @@ async function addRow(){
 }
 
 async function saveRow(e){
-  const tr = e.target.closest('tr');
-  const id = tr.dataset.id;
-  const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
-  const name = nfc(tr.querySelector('[data-field="name"]').value);
-  const code = nfc(tr.querySelector('[data-field="code"]').value);
-  const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
+  const btn = e.target;
+  const prevText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '저장중';
 
-  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
-  if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
-  if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
-  if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('유효기간은 yymmdd 형식으로 입력해주세요. (예: 280131)'); return; }
+  try {
+    const tr = e.target.closest('tr');
+    const id = tr.dataset.id;
+    const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
+    const name = nfc(tr.querySelector('[data-field="name"]').value);
+    const code = nfc(tr.querySelector('[data-field="code"]').value);
+    const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
 
-  const payload = { no, name, code, expiry_date: expiry || null };
-  const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
-  if(error){ alert('저장 실패: ' + error.message); return; }
+    if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
+    if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
+    if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+    if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('유효기간은 yymmdd 형식으로 입력해주세요. (예: 280131)'); return; }
 
-  const idx = rows.findIndex(x => String(x.id) === String(id));
-  if(idx >= 0){ rows[idx] = { ...rows[idx], ...payload, expiry_date: expiry }; }
+    const payload = { no, name, code, expiry_date: expiry || null };
+    const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
+    if(error){ alert('저장 실패: ' + error.message); return; }
 
-  statusEl.textContent = `저장 완료 (ID ${id})`;
-  statusEl.className='row muted ok';
-  render();
+    const idx = rows.findIndex(x => String(x.id) === String(id));
+    if(idx >= 0){ rows[idx] = { ...rows[idx], ...payload, expiry_date: expiry }; }
+
+    statusEl.textContent = `저장 완료 (ID ${id})`;
+    statusEl.className='row muted ok';
+    render();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
 }
 
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
@@ -483,7 +487,6 @@ loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
 adminAddRowBtn.addEventListener('click', addRow);
-adminClearAllBtn.addEventListener('click', clearAllRows);
 
 document.getElementById('pwCancel').addEventListener('click', closePwModal);
 document.getElementById('pwConfirm').addEventListener('click', ()=>{
