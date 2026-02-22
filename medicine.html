@@ -80,14 +80,16 @@
     .drug-actions{display:flex;justify-content:flex-end;margin-top:8px}
 
     .card-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-    .med-card{background:#fff;border:1px solid #e8edf6;border-radius:14px;padding:12px;box-shadow:0 4px 12px rgba(17,24,39,.04)}
-    .med-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .med-card{background:#fff;border:1px solid #e8edf6;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(17,24,39,.04)}
+    .med-card.dirty{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.15)}
+    .med-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
     .med-card .num{font-weight:700;font-size:13px;color:#334155;background:#eef2ff;border-radius:999px;padding:3px 8px}
     .med-card .name{font-weight:700;font-size:17px;line-height:1.25;margin-bottom:2px}
     .med-card .code{color:#64748b;font-size:12px}
     .med-card .expiry{margin-top:8px;font-size:13px}
-    .med-card .actions{margin-top:10px;display:flex;gap:6px}
-    .med-card .actions button{flex:1}
+    .field-label{margin-top:8px;margin-bottom:4px;font-size:12px;color:#64748b;font-weight:600}
+    .med-card .actions{margin-top:12px;display:flex;gap:8px}
+    .med-card .actions button{flex:1;height:38px;font-size:13px}
 
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
     .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
@@ -416,10 +418,14 @@ function cardView(r){
   return `
     <div class="med-card" data-id="${r.id}">
       <div class="head"><span class="num">#${r.no}</span></div>
+      <div class="field-label">번호</div>
       <input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" />
-      <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:6px" />
-      <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:6px" />
-      <input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" style="margin-top:6px" />
+      <div class="field-label">약품명</div>
+      <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:2px" />
+      <div class="field-label">약품코드</div>
+      <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:2px" />
+      <div class="field-label">유효기간 (yymmdd)</div>
+      <input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" style="margin-top:2px" />
       <div class="actions">
         <button class="save-btn" data-action="save">저장</button>
         <button class="save-btn" data-action="delete" style="border-color:#f1b5b5;color:#b91c1c">삭제</button>
@@ -430,6 +436,12 @@ function cardView(r){
 function bindActions(root){
   root.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
   root.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
+  root.querySelectorAll('.med-card .cell-input').forEach(inp => {
+    inp.addEventListener('input', (e)=>{
+      const card = e.target.closest('.med-card');
+      if(card) card.classList.add('dirty');
+    });
+  });
 }
 
 function render(){
