@@ -11,8 +11,14 @@
     .wrap{max-width:1200px;margin:0 auto}
     .sticky-tools{position:sticky;top:0;z-index:15;background:#f6f7fb;padding-top:6px;padding-bottom:6px}
     .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input,button{padding:10px;border:1px solid #ddd;border-radius:10px}
-    input{font-size:15px}
+    input,button{padding:10px;border:1px solid #ddd;border-radius:12px}
+    input{font-size:15px;background:#fff}
+    #q{background:#fff;border:1px solid #d7dfeb;box-shadow:0 2px 8px rgba(17,24,39,.04)}
+    button{background:#fff;cursor:pointer}
+    #reload{background:#f1f5ff;border-color:#dbe6ff}
+    .save-btn[data-action="save"], .save-btn{font-weight:600}
+    button[data-action="save"]{background:#2563eb;color:#fff;border-color:#2563eb}
+    button[data-action="delete"]{background:#fff;color:#b91c1c;border-color:#f2b2b2}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
     th,td{padding:9px 10px;border-bottom:1px solid #eef1f6;text-align:left;font-size:14px;vertical-align:middle;line-height:1.35}
     .muted{color:#6b7280;font-size:12px}
@@ -196,7 +202,7 @@ function normalizeDateInput(v){
   const dd = s.slice(4,6);
   return `20${yy}-${mm}-${dd}`;
 }
-function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
+function dday(d){ if(!d) return '-'; const t = new Date(d); if(isNaN(t)) return '-'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 
 function setMode(){
   modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
@@ -211,8 +217,8 @@ function rowView(r){
     return `
       <tr data-id="${r.id}">
         <td data-label="번호">${r.no}</td>
-        <td data-label="약품명"><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
-        <td data-label="유효기간">${r.expiry_date || '—'}</td>
+        <td data-label="약품명"><b>${esc(r.name)}</b> <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="유효기간">${r.expiry_date || '-'}</td>
         <td data-label="저장" class="muted">-</td>
       </tr>`;
   }
@@ -403,9 +409,7 @@ function cardView(r){
         <div class="name">${esc(r.name)}</div>
         <div class="code">코드: ${esc(r.code)}</div>
         <div class="expiry">유효기간: ${esc(r.expiry_date || '-')}</div>
-        <div class="actions">
-          <button type="button" class="med-link" data-name="${esc(r.name)}">약품 정보 보기</button>
-        </div>
+        <div class="actions"></div>
       </div>`;
   }
 
@@ -424,7 +428,6 @@ function cardView(r){
 }
 
 function bindActions(root){
-  root.querySelectorAll('.med-link').forEach(btn => btn.addEventListener('click', () => openDrugInfo(btn.dataset.name || '')));
   root.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
   root.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
 }
