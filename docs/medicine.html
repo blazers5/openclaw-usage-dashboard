@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>?쏀뭹愿由??쒖뒪??(Supabase)</title>
+  <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box}
@@ -47,7 +47,7 @@
       tr{display:table-row}
       td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      /* 紐⑤컮?? 踰덊샇/?쏀뭹紐?媛꾧꺽 異뺤냼 + ?좏슚湲곌컙 ?좊챸?섍쾶 */
+      /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
       th:nth-child(1), td:nth-child(1){width:40px;padding-right:2px}
       th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
       th:nth-child(3), td:nth-child(3){width:126px; text-align:right; white-space:nowrap}
@@ -79,59 +79,60 @@
 </head>
 <body>
 <div class="wrap">
-  <h2>?쏀뭹愿由??쒖뒪??(怨듭쑀??</h2>
+  <h2>약품관리 시스템 (공유형)</h2>
   <div class="sticky-tools">
     <div class="top">
-      <input id="q" placeholder="?쏀뭹紐?踰덊샇/肄붾뱶 寃?? style="flex:1;min-width:240px" />
-      <button id="adminLogin">愿由ъ옄 濡쒓렇??/button>
-      <button id="adminLogout" style="display:none">濡쒓렇?꾩썐</button>
-      <button id="adminAddRow" style="display:none">??異붽?</button>
-      <span id="mode" class="pill">議고쉶 ?꾩슜</span>
-      <button id="reload">?덈줈怨좎묠</button>
+      <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+      <button id="adminLogin">관리자 로그인</button>
+      <button id="adminLogout" style="display:none">로그아웃</button>
+      <button id="adminAddRow" style="display:none">행 추가</button>
+      <button id="adminClearAll" style="display:none">전체 삭제</button>
+      <span id="mode" class="pill">조회 전용</span>
+      <button id="reload">새로고침</button>
     </div>
 
-    <div class="row muted" id="status">?곌껐 以?..</div>
+    <div class="row muted" id="status">연결 중...</div>
   </div>
 
   <div class="row table-wrap">
     <table>
       <thead>
         <tr>
-          <th style="width:64px">踰덊샇</th>
-          <th>?쏀뭹紐?肄붾뱶)</th>
-          <th style="width:120px">?좏슚湲곌컙</th>
-          <th style="width:72px">???/th>
+          <th style="width:64px">번호</th>
+          <th>약품명(코드)</th>
+          <th style="width:120px">유효기간</th>
+          <th style="width:72px">저장</th>
         </tr>
       </thead>
       <tbody id="tb"></tbody>
     </table>
   </div>
 
-  <div class="footer">湲곕낯 議고쉶 ?꾩슜 / 愿由ъ옄 濡쒓렇????踰덊샇쨌?쏀뭹紐끒룹빟?덉퐫?쑣룹쑀?④린媛?紐⑤몢 ?몄쭛 ?????⑥쐞 ???媛??/div>
+  <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
 
-<div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="?쏀뭹 寃??寃곌낵">
+<div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
   <div class="float-head">
-    <b id="drugFloatTitle">?쏀뭹 ?뺣낫</b>
-    <button id="drugFloatClose">?リ린</button>
+    <b id="drugFloatTitle">약품 정보</b>
+    <button id="drugFloatClose">닫기</button>
   </div>
   <div class="float-body">
-    <div id="drugFloatLoading" class="muted">寃??以?..</div>
+    <div id="drugFloatLoading" class="muted">검색 중...</div>
     <div id="drugFloatError" class="muted err" style="display:none"></div>
     <ul id="drugFloatList" class="drug-list"></ul>
     <div class="drug-actions">
-      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">?ㅼ씠踰??먮Ц ?닿린</a>
+      <a id="drugFloatOpenNaver" target="_blank" rel="noopener noreferrer">네이버 원문 열기</a>
     </div>
   </div>
 </div>
 
 <div class="modal-backdrop" id="pwModal">
   <div class="modal">
-    <h3>愿由ъ옄 濡쒓렇??/h3>
-    <input id="pwInput" type="password" placeholder="鍮꾨?踰덊샇 ?낅젰" style="width:100%" />
+    <h3>관리자 로그인</h3>
+    <input id="pwInput" type="password" placeholder="비밀번호 입력" style="width:100%" />
     <div class="actions">
-      <button id="pwCancel">痍⑥냼</button>
-      <button id="pwConfirm">濡쒓렇??/button>
+      <button id="pwCancel">취소</button>
+      <button id="pwConfirm">로그인</button>
     </div>
   </div>
 </div>
@@ -153,6 +154,7 @@ const modeEl = document.getElementById('mode');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
 const adminAddRowBtn = document.getElementById('adminAddRow');
+const adminClearAllBtn = document.getElementById('adminClearAll');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
@@ -178,38 +180,40 @@ function normalizeDateInput(v){
   const dd = s.slice(4,6);
   return `20${yy}-${mm}-${dd}`;
 }
-function dday(d){ if(!d) return '??; const t = new Date(d); if(isNaN(t)) return '??; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '留뚮즺'; }
+function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 
 function setMode(){
-  modeEl.textContent = isAdmin ? '愿由ъ옄 ?몄쭛 媛?? : '議고쉶 ?꾩슜';
+  modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
   loginBtn.style.display = isAdmin ? 'none' : 'inline-block';
   logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
   adminAddRowBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  adminClearAllBtn.style.display = isAdmin ? 'inline-block' : 'none';
 }
 
 function rowView(r){
   if(!isAdmin){
     return `
       <tr data-id="${r.id}">
-        <td data-label="踰덊샇">${r.no}</td>
-        <td data-label="?쏀뭹紐?><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
-        <td data-label="?좏슚湲곌컙">${r.expiry_date || '??}</td>
-        <td data-label="??? class="muted">-</td>
+        <td data-label="번호">${r.no}</td>
+        <td data-label="약품명"><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="유효기간">${r.expiry_date || '—'}</td>
+        <td data-label="저장" class="muted">-</td>
       </tr>`;
   }
 
   return `
     <tr data-id="${r.id}">
-      <td data-label="踰덊샇"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
-      <td data-label="?쏀뭹紐?>
+      <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
+      <td data-label="약품명">
+        <span>${esc(r.name)}</span>
         <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
-      <td data-label="?좏슚湲곌컙"><input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" /></td>
-      <td data-label="???>
+      <td data-label="유효기간"><input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" /></td>
+      <td data-label="저장">
         <div class="save-wrap">
-          <button class="save-btn" data-action="save">???/button>
-          <button class="save-btn" data-action="delete">??젣</button>
+          <button class="save-btn" data-action="save">저장</button>
+          <button class="save-btn" data-action="delete">삭제</button>
         </div>
       </td>
     </tr>`;
@@ -217,35 +221,20 @@ function rowView(r){
 
 function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
 
-function isJunkNaverResult(title, link, qText){
-  const t = String(title || '').trim().toLowerCase();
-  const l = String(link || '').toLowerCase();
-
-  if(!t || !l) return true;
-  if(t === '_naver_' || t === '@naver.com') return true;
-  if(t.includes('n pay') || t.includes('pay') || t.includes('메일') || t.includes('블로그') || t.includes('카페') || t.includes('알림') || t.includes('톡')) return true;
-  if(/\/mail|\/blog|\/cafe|\/pay|\/talk|\/mypage|\/my\//i.test(l)) return true;
-  if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(l)) return true;
-
-  if(qText){
-    const q = String(qText).toLowerCase();
-    if(!(`${t} ${l}`).includes(q)) return true;
-  }
-  return false;
-}
-
-function parseJinaFallback(text, qText){
+function parseJinaFallback(text){
   const raw = String(text || '');
   const out = [];
   const seen = new Set();
 
+  // r.jina.ai가 반환한 markdown 링크 파싱: [제목](URL)
   const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
   let m;
   while((m = re.exec(raw)) !== null){
     const title = stripHtml(m[1] || '').trim();
     const link = m[2] || '';
     if(!title || !link) continue;
-    if(isJunkNaverResult(title, link, qText)) continue;
+    if(/search\.naver\.com\/search\.naver/i.test(link)) continue;
+    if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(link)) continue;
     if(seen.has(link)) continue;
     seen.add(link);
     out.push({ title, link, snippet: '네이버 검색 결과' });
@@ -255,27 +244,27 @@ function parseJinaFallback(text, qText){
   return out;
 }
 
-function sanitizeResults(items, qText, qEncoded){
+function sanitizeResults(items, q){
   const badRe = /SecurityCompromiseError|blocked until|Too many domains|DDos|Anonymous access|\{\s*"?data"?\s*:/i;
   const safe = (Array.isArray(items) ? items : []).filter(item => {
     const title = stripHtml(item?.title || '');
     const snippet = stripHtml(item?.snippet || item?.description || '');
     const link = String(item?.link || '');
     if(!/^https?:\/\//i.test(link)) return false;
-    if(isJunkNaverResult(title, link, qText)) return false;
     if(badRe.test(title) || badRe.test(snippet)) return false;
     if(title.trim().startsWith('{') || snippet.trim().startsWith('{')) return false;
     return true;
   });
-  return safe.length ? safe : buildGuaranteedResults(qEncoded);
+  return safe.length ? safe : buildGuaranteedResults(q);
 }
+
 function renderDrugResults(items){
   if(!Array.isArray(items) || items.length === 0){
-    drugFloatList.innerHTML = '<li class="muted">寃??寃곌낵媛 ?놁뒿?덈떎.</li>';
+    drugFloatList.innerHTML = '<li class="muted">검색 결과가 없습니다.</li>';
     return;
   }
   drugFloatList.innerHTML = items.map(item => {
-    const title = esc(stripHtml(item.title || '?쒕ぉ ?놁쓬'));
+    const title = esc(stripHtml(item.title || '제목 없음'));
     const link = esc(item.link || '#');
     const snippet = esc(stripHtml(item.snippet || item.description || ''));
     return `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>${snippet ? `<span class="drug-snippet">${snippet}</span>` : ''}</li>`;
@@ -297,42 +286,42 @@ async function fetchProxyResults(q){
   throw lastError || new Error('proxy_unavailable');
 }
 
-function buildGuaranteedResults(qEncoded){
+function buildGuaranteedResults(q){
   return [
     {
-      title: '?ㅼ씠踰??듯빀寃??,
-      link: `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`,
-      snippet: '?쏀뭹紐낆쓣 湲곗??쇰줈 ?ㅼ씠踰??듯빀寃??寃곌낵瑜??쎈땲??'
+      title: '네이버 통합검색',
+      link: `https://search.naver.com/search.naver?where=nexearch&query=${q}`,
+      snippet: '약품명을 기준으로 네이버 통합검색 결과를 엽니다.'
     },
     {
-      title: '?ㅼ씠踰??댁뒪',
-      link: `https://search.naver.com/search.naver?where=news&query=${qEncoded}`,
-      snippet: '愿???댁뒪/湲곗궗 以묒떖 寃곌낵瑜??뺤씤?⑸땲??'
+      title: '네이버 뉴스',
+      link: `https://search.naver.com/search.naver?where=news&query=${q}`,
+      snippet: '관련 뉴스/기사 중심 결과를 확인합니다.'
     },
     {
-      title: '?ㅼ씠踰?吏?쓎N',
-      link: `https://search.naver.com/search.naver?where=kin&query=${qEncoded}`,
-      snippet: '?ъ슜??吏덈Ц/?듬? 以묒떖 寃곌낵瑜??뺤씤?⑸땲??'
+      title: '네이버 지식iN',
+      link: `https://search.naver.com/search.naver?where=kin&query=${q}`,
+      snippet: '사용자 질문/답변 중심 결과를 확인합니다.'
     }
   ];
 }
 
-async function fetchFallbackResults(qEncoded, qText){
+async function fetchFallbackResults(q){
   try {
-    const res = await fetch(`${NAVER_READABLE_SEARCH}${qEncoded}`);
+    const res = await fetch(`${NAVER_READABLE_SEARCH}${q}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    const parsed = parseJinaFallback(text, qText);
+    const parsed = parseJinaFallback(text);
     if(parsed.length) return parsed;
   } catch {}
-  return buildGuaranteedResults(qEncoded);
+  return buildGuaranteedResults(q);
 }
 
 async function openDrugInfo(name){
   const qText = nfc(name);
-  const qEncoded = encodeURIComponent(qText);
-  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`;
-  drugFloatTitle.textContent = `?쏀뭹 ?뺣낫: ${qText}`;
+  const q = encodeURIComponent(qText);
+  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  drugFloatTitle.textContent = `약품 정보: ${qText}`;
   drugFloatOpenNaver.href = naverUrl;
   drugFloat.style.display = 'block';
   drugFloatLoading.style.display = 'block';
@@ -340,31 +329,31 @@ async function openDrugInfo(name){
   drugFloatList.innerHTML = '';
 
   try {
-    const results = sanitizeResults(await fetchProxyResults(qEncoded), qText, qEncoded);
+    const results = sanitizeResults(await fetchProxyResults(q), q);
     if(results.length > 0){
       renderDrugResults(results);
       return;
     }
-    const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
+    const fallback = sanitizeResults(await fetchFallbackResults(q), q);
     renderDrugResults(fallback);
     if(fallback.length){
-      drugFloatError.textContent = '?꾨줉??誘몄뿰寃??곹깭濡??泥?寃??寃곌낵瑜??쒖떆?덉뒿?덈떎.';
+      drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
       drugFloatError.style.display = 'block';
     }
   } catch (err) {
     try {
-      const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
+      const fallback = sanitizeResults(await fetchFallbackResults(q), q);
       renderDrugResults(fallback);
       if(fallback.length){
-        drugFloatError.textContent = '?꾨줉??誘몄뿰寃??곹깭濡??泥?寃??寃곌낵瑜??쒖떆?덉뒿?덈떎.';
+        drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
         drugFloatError.style.display = 'block';
       } else {
         throw new Error('fallback-empty');
       }
     } catch {
-      const guaranteed = buildGuaranteedResults(qEncoded);
+      const guaranteed = buildGuaranteedResults(q);
       renderDrugResults(guaranteed);
-      drugFloatError.textContent = '?ㅼ떆媛?寃곌낵 ?섏쭛??吏?곕릺???泥?寃??移대뱶瑜??쒖떆?덉뒿?덈떎.';
+      drugFloatError.textContent = '실시간 결과 수집이 지연되어 대체 검색 카드를 표시했습니다.';
       drugFloatError.style.display = 'block';
     }
   } finally {
@@ -390,9 +379,9 @@ function render(){
 }
 
 async function loadData(){
-  statusEl.textContent = '?곗씠??遺덈윭?ㅻ뒗 以?..';
+  statusEl.textContent = '데이터 불러오는 중...';
   const { data, error } = await db.from('medicine_inventory').select('*').order('no', {ascending:true});
-  if(error){ statusEl.textContent = '遺덈윭?ㅺ린 ?ㅽ뙣: ' + error.message; statusEl.className='row muted err'; return; }
+  if(error){ statusEl.textContent = '불러오기 실패: ' + error.message; statusEl.className='row muted err'; return; }
   rows = (data||[]).map(r => ({
     id: r.id,
     no: Number(r.no),
@@ -400,51 +389,53 @@ async function loadData(){
     code: nfc(r.code),
     expiry_date: r.expiry_date ? nfc(r.expiry_date) : ''
   }));
-  statusEl.textContent = `珥?${rows.length}嫄?濡쒕뱶 ?꾨즺`;
+  statusEl.textContent = `총 ${rows.length}건 로드 완료`;
   statusEl.className='row muted ok';
   render();
 }
 
 async function deleteRow(e){
-  const btn = e.target;
-  const prevText = btn.textContent;
-  if(!confirm('???됱쓣 ??젣?좉퉴??')) return;
-
-  btn.disabled = true;
-  btn.textContent = '??젣以?;
-
-  try {
-    const tr = e.target.closest('tr');
-    const id = tr.dataset.id;
-    const { error } = await db.from('medicine_inventory').delete().eq('id', id);
-    if(error){
-      alert('??젣 ?ㅽ뙣: ' + error.message + '\n\n(??젣 ?뺤콉???놁쓣 ???덉뼱. ?쒓? 諛붾줈 SQL ??以??쒕━寃좎뒿?덈떎.)');
-      return;
-    }
-    rows = rows.filter(x => String(x.id) !== String(id));
-    statusEl.textContent = `??젣 ?꾨즺 (ID ${id})`;
-    statusEl.className='row muted ok';
-    render();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = prevText;
+  if(!confirm('이 행을 삭제할까요?')) return;
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const { error } = await db.from('medicine_inventory').delete().eq('id', id);
+  if(error){
+    alert('삭제 실패: ' + error.message + '\n\n(삭제 정책이 없을 수 있어. 내가 바로 SQL 한 줄 줄게.)');
+    return;
   }
+  rows = rows.filter(x => String(x.id) !== String(id));
+  statusEl.textContent = `삭제 완료 (ID ${id})`;
+  statusEl.className='row muted ok';
+  render();
+}
+
+async function clearAllRows(){
+  if(!confirm('정말 전체 약품 데이터를 삭제할까요? 되돌릴 수 없습니다.')) return;
+  const { error } = await db.from('medicine_inventory').delete().gt('id', 0);
+  if(error){
+    alert('전체 삭제 실패: ' + error.message + '\n\n(삭제 정책 SQL 적용이 필요할 수 있어.)');
+    return;
+  }
+  rows = [];
+  statusEl.textContent = '전체 삭제 완료';
+  statusEl.className='row muted ok';
+  render();
 }
 
 async function addRow(){
   const maxNo = rows.reduce((m,r)=>Math.max(m, Number(r.no)||0), 0);
-  const noInput = prompt('??踰덊샇 ?낅젰', String(maxNo + 1));
+  const noInput = prompt('새 번호 입력', String(maxNo + 1));
   if(noInput === null) return;
   const no = Number(nfc(noInput));
-  if(!Number.isFinite(no) || no <= 0){ alert('踰덊샇??1 ?댁긽???レ옄?ъ빞 ?⑸땲??'); return; }
-  const name = nfc(prompt('?쏀뭹紐??낅젰', '?좉퇋 ?쏀뭹') || '');
-  if(!name){ alert('?쏀뭹紐낆쓣 ?낅젰?댁빞 ?⑸땲??'); return; }
-  const code = nfc(prompt('?쏀뭹肄붾뱶 ?낅젰', 'new_code') || '');
-  if(!code){ alert('?쏀뭹肄붾뱶瑜??낅젰?댁빞 ?⑸땲??'); return; }
+  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자여야 합니다.'); return; }
+  const name = nfc(prompt('약품명 입력', '신규 약품') || '');
+  if(!name){ alert('약품명을 입력해야 합니다.'); return; }
+  const code = nfc(prompt('약품코드 입력', 'new_code') || '');
+  if(!code){ alert('약품코드를 입력해야 합니다.'); return; }
 
   const payload = { no, name, code, expiry_date: null };
   const { data, error } = await db.from('medicine_inventory').insert(payload).select('*').single();
-  if(error){ alert('??異붽? ?ㅽ뙣: ' + error.message); return; }
+  if(error){ alert('행 추가 실패: ' + error.message); return; }
 
   rows.push({
     id: data.id,
@@ -454,44 +445,34 @@ async function addRow(){
     expiry_date: data.expiry_date ? nfc(data.expiry_date) : ''
   });
   rows.sort((a,b)=>a.no-b.no);
-  statusEl.textContent = `??異붽? ?꾨즺 (ID ${data.id})`;
+  statusEl.textContent = `행 추가 완료 (ID ${data.id})`;
   statusEl.className='row muted ok';
   render();
 }
 
 async function saveRow(e){
-  const btn = e.target;
-  const prevText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '??μ쨷';
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+  const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
+  const name = nfc(tr.querySelector('[data-field="name"]').value);
+  const code = nfc(tr.querySelector('[data-field="code"]').value);
+  const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
 
-  try {
-    const tr = e.target.closest('tr');
-    const id = tr.dataset.id;
-    const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
-    const name = nfc(tr.querySelector('[data-field="name"]').value);
-    const code = nfc(tr.querySelector('[data-field="code"]').value);
-    const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
+  if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
+  if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
+  if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+  if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('유효기간은 yymmdd 형식으로 입력해주세요. (예: 280131)'); return; }
 
-    if(!Number.isFinite(no) || no <= 0){ alert('踰덊샇??1 ?댁긽???レ옄濡??낅젰?댁＜?몄슂.'); return; }
-    if(!name){ alert('?쏀뭹紐낆? 鍮꾩썙?????놁뒿?덈떎.'); return; }
-    if(!code){ alert('?쏀뭹肄붾뱶??鍮꾩썙?????놁뒿?덈떎.'); return; }
-    if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('?좏슚湲곌컙? yymmdd ?뺤떇?쇰줈 ?낅젰?댁＜?몄슂. (?? 280131)'); return; }
+  const payload = { no, name, code, expiry_date: expiry || null };
+  const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
+  if(error){ alert('저장 실패: ' + error.message); return; }
 
-    const payload = { no, name, code, expiry_date: expiry || null };
-    const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
-    if(error){ alert('????ㅽ뙣: ' + error.message); return; }
+  const idx = rows.findIndex(x => String(x.id) === String(id));
+  if(idx >= 0){ rows[idx] = { ...rows[idx], ...payload, expiry_date: expiry }; }
 
-    const idx = rows.findIndex(x => String(x.id) === String(id));
-    if(idx >= 0){ rows[idx] = { ...rows[idx], ...payload, expiry_date: expiry }; }
-
-    statusEl.textContent = `????꾨즺 (ID ${id})`;
-    statusEl.className='row muted ok';
-    render();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = prevText;
-  }
+  statusEl.textContent = `저장 완료 (ID ${id})`;
+  statusEl.className='row muted ok';
+  render();
 }
 
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
@@ -502,6 +483,7 @@ loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
 adminAddRowBtn.addEventListener('click', addRow);
+adminClearAllBtn.addEventListener('click', clearAllRows);
 
 document.getElementById('pwCancel').addEventListener('click', closePwModal);
 document.getElementById('pwConfirm').addEventListener('click', ()=>{
@@ -512,7 +494,7 @@ document.getElementById('pwConfirm').addEventListener('click', ()=>{
     closePwModal();
     render();
   } else {
-    alert('鍮꾨?踰덊샇媛 ?щ컮瑜댁? ?딆뒿?덈떎.');
+    alert('비밀번호가 올바르지 않습니다.');
   }
 });
 pwInput.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter') document.getElementById('pwConfirm').click(); });
