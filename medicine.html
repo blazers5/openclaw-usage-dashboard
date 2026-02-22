@@ -221,20 +221,31 @@ function rowView(r){
 
 function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
 
-function parseJinaFallback(text){
+function isJunkResult(title, link){
+  const t = String(title || '').trim().toLowerCase();
+  const l = String(link || '').toLowerCase();
+  if(!t || !l) return true;
+  if(t === '_naver_' || t === '@naver.com') return true;
+  if(/내\s*페이|n\s*pay|메일|블로그|카페|알림|네이버톡|my|pay|mail|blog|cafe/i.test(t)) return true;
+  if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(l)) return true;
+  if(/\/mail|\/blog|\/cafe|\/pay|\/talk|\/mypage|\/my\//i.test(l)) return true;
+  return false;
+}
+
+function parseJinaFallback(text, qText){
   const raw = String(text || '');
   const out = [];
   const seen = new Set();
+  const qLower = String(qText || '').toLowerCase();
 
-  // r.jina.ai가 반환한 markdown 링크 파싱: [제목](URL)
   const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
   let m;
   while((m = re.exec(raw)) !== null){
     const title = stripHtml(m[1] || '').trim();
     const link = m[2] || '';
     if(!title || !link) continue;
-    if(/search\.naver\.com\/search\.naver/i.test(link)) continue;
-    if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(link)) continue;
+    if(isJunkResult(title, link)) continue;
+    if(qLower && !(`${title} ${link}`.toLowerCase().includes(qLower))) continue;
     if(seen.has(link)) continue;
     seen.add(link);
     out.push({ title, link, snippet: '네이버 검색 결과' });
@@ -244,18 +255,21 @@ function parseJinaFallback(text){
   return out;
 }
 
-function sanitizeResults(items, q){
+function sanitizeResults(items, qText, qEncoded){
   const badRe = /SecurityCompromiseError|blocked until|Too many domains|DDos|Anonymous access|\{\s*"?data"?\s*:/i;
+  const qLower = String(qText || '').toLowerCase();
   const safe = (Array.isArray(items) ? items : []).filter(item => {
     const title = stripHtml(item?.title || '');
     const snippet = stripHtml(item?.snippet || item?.description || '');
     const link = String(item?.link || '');
     if(!/^https?:\/\//i.test(link)) return false;
+    if(isJunkResult(title, link)) return false;
     if(badRe.test(title) || badRe.test(snippet)) return false;
     if(title.trim().startsWith('{') || snippet.trim().startsWith('{')) return false;
+    if(qLower && !(`${title} ${snippet} ${link}`.toLowerCase().includes(qLower))) return false;
     return true;
   });
-  return safe.length ? safe : buildGuaranteedResults(q);
+  return safe.length ? safe : buildGuaranteedResults(qEncoded, qText);
 }
 
 function renderDrugResults(items){
@@ -286,41 +300,37 @@ async function fetchProxyResults(q){
   throw lastError || new Error('proxy_unavailable');
 }
 
-function buildGuaranteedResults(q){
+function buildGuaranteedResults(qEncoded, qText){
+  const name = qText || '약품';
   return [
     {
-      title: '네이버 통합검색',
-      link: `https://search.naver.com/search.naver?where=nexearch&query=${q}`,
-      snippet: '약품명을 기준으로 네이버 통합검색 결과를 엽니다.'
+      title: `${name} 네이버 통합검색`,
+      link: `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`,
+      snippet: '약품명 검색 결과를 엽니다.'
     },
     {
-      title: '네이버 뉴스',
-      link: `https://search.naver.com/search.naver?where=news&query=${q}`,
-      snippet: '관련 뉴스/기사 중심 결과를 확인합니다.'
-    },
-    {
-      title: '네이버 지식iN',
-      link: `https://search.naver.com/search.naver?where=kin&query=${q}`,
-      snippet: '사용자 질문/답변 중심 결과를 확인합니다.'
+      title: `${name} 의약품 정보 검색`,
+      link: `https://terms.naver.com/search.naver?query=${qEncoded}`,
+      snippet: '의약품/성분 관련 정보 검색 결과를 엽니다.'
     }
   ];
 }
 
-async function fetchFallbackResults(q){
+async function fetchFallbackResults(qEncoded, qText){
   try {
-    const res = await fetch(`${NAVER_READABLE_SEARCH}${q}`);
+    const res = await fetch(`${NAVER_READABLE_SEARCH}${qEncoded}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    const parsed = parseJinaFallback(text);
+    const parsed = parseJinaFallback(text, qText);
     if(parsed.length) return parsed;
   } catch {}
-  return buildGuaranteedResults(q);
+  return buildGuaranteedResults(qEncoded, qText);
 }
 
 async function openDrugInfo(name){
   const qText = nfc(name);
-  const q = encodeURIComponent(qText);
-  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  const qEncoded = encodeURIComponent(qText);
+  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`;
   drugFloatTitle.textContent = `약품 정보: ${qText}`;
   drugFloatOpenNaver.href = naverUrl;
   drugFloat.style.display = 'block';
@@ -329,12 +339,12 @@ async function openDrugInfo(name){
   drugFloatList.innerHTML = '';
 
   try {
-    const results = sanitizeResults(await fetchProxyResults(q), q);
+    const results = sanitizeResults(await fetchProxyResults(qEncoded), qText, qEncoded);
     if(results.length > 0){
       renderDrugResults(results);
       return;
     }
-    const fallback = sanitizeResults(await fetchFallbackResults(q), q);
+    const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
     renderDrugResults(fallback);
     if(fallback.length){
       drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
@@ -342,7 +352,7 @@ async function openDrugInfo(name){
     }
   } catch (err) {
     try {
-      const fallback = sanitizeResults(await fetchFallbackResults(q), q);
+      const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
       renderDrugResults(fallback);
       if(fallback.length){
         drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
@@ -351,7 +361,7 @@ async function openDrugInfo(name){
         throw new Error('fallback-empty');
       }
     } catch {
-      const guaranteed = buildGuaranteedResults(q);
+      const guaranteed = buildGuaranteedResults(qEncoded, qText);
       renderDrugResults(guaranteed);
       drugFloatError.textContent = '실시간 결과 수집이 지연되어 대체 검색 카드를 표시했습니다.';
       drugFloatError.style.display = 'block';
