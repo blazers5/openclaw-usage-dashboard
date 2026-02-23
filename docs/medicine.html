@@ -18,17 +18,17 @@
     .icon-btn .txt{display:none}
     .icon-btn:hover{background:#f8fbff}
     .mode-chip{background:#f8fafc;color:#475569}
-    .sticky-tools{position:sticky;top:0;z-index:15;background:#eef1f4;padding-top:6px;padding-bottom:6px}
-    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:#eef1f4;padding-top:6px;padding-bottom:6px;max-width:860px;margin:0 auto}
+    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
     input,button{padding:10px;border:1px solid #cfd8e3;border-radius:12px}
     input{font-size:15px;background:#fff;color:#111827}
-    #q{background:#fff;border:1px solid #c7d3e2;box-shadow:0 2px 8px rgba(17,24,39,.06)}
+    #q{background:#fff;border:1px solid #c7d3e2;box-shadow:0 2px 8px rgba(17,24,39,.06);width:min(860px,100%);min-width:0;height:44px;font-size:16px}
     button{background:#fff;cursor:pointer;color:#1f2937;font-weight:600}
     #reload{background:#f1f5ff;border-color:#dbe6ff}
     .save-btn[data-action="save"], .save-btn{font-weight:600}
     button[data-action="save"]{background:#2563eb;color:#fff;border-color:#2563eb}
     button[data-action="delete"]{background:#fff;color:#b91c1c;border-color:#f2b2b2}
-    table{width:auto;min-width:860px;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;table-layout:fixed}
+    table{width:100%;min-width:860px;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;table-layout:fixed}
     th,td{padding:10px 11px;border-bottom:1px solid #e3e9f2;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
     th{background:#f4f7fb;color:#334155;font-weight:700}
     th:nth-child(1), td:nth-child(1){width:72px;text-align:center}
@@ -38,7 +38,7 @@
     .muted{color:#475569;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
-    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch;max-width:860px;margin:10px auto 0}
     .footer{margin-top:10px;color:#666;font-size:12px}
     .cell-input{width:100%;min-width:96px;padding:8px;font-size:13px}
     .save-btn{padding:6px 10px;font-size:12px}
@@ -116,7 +116,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="title-bar">
+  <div class="title-bar" style="max-width:860px;margin:0 auto 12px;">
     <h2>약품관리 시스템</h2>
     <div class="title-actions">
       <button id="adminLogin" class="icon-btn" title="관리자 로그인" aria-label="관리자 로그인"><span class="ico">🔐</span><span class="txt">관리자</span></button>
@@ -127,7 +127,7 @@
   </div>
   <div class="sticky-tools">
     <div class="top">
-      <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+      <input id="q" placeholder="약품명/번호/코드 검색" />
       <button id="adminAddRow" style="display:none">행 추가</button>
       <button id="adminClearAll" style="display:none">전체 삭제</button>
     </div>
