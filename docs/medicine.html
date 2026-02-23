@@ -7,21 +7,23 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#eef1f4;color:#1f2937;padding:16px;line-height:1.5}
     .wrap{max-width:1200px;margin:0 auto}
-    .sticky-tools{position:sticky;top:0;z-index:15;background:#f6f7fb;padding-top:6px;padding-bottom:6px}
+    h2{margin:0 0 12px;font-size:28px;letter-spacing:-0.2px;color:#0f172a}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:#eef1f4;padding-top:6px;padding-bottom:6px}
     .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input,button{padding:10px;border:1px solid #ddd;border-radius:12px}
-    input{font-size:15px;background:#fff}
-    #q{background:#fff;border:1px solid #d7dfeb;box-shadow:0 2px 8px rgba(17,24,39,.04)}
-    button{background:#fff;cursor:pointer}
+    input,button{padding:10px;border:1px solid #cfd8e3;border-radius:12px}
+    input{font-size:15px;background:#fff;color:#111827}
+    #q{background:#fff;border:1px solid #c7d3e2;box-shadow:0 2px 8px rgba(17,24,39,.06)}
+    button{background:#fff;cursor:pointer;color:#1f2937;font-weight:600}
     #reload{background:#f1f5ff;border-color:#dbe6ff}
     .save-btn[data-action="save"], .save-btn{font-weight:600}
     button[data-action="save"]{background:#2563eb;color:#fff;border-color:#2563eb}
     button[data-action="delete"]{background:#fff;color:#b91c1c;border-color:#f2b2b2}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
-    th,td{padding:9px 10px;border-bottom:1px solid #eef1f6;text-align:left;font-size:14px;vertical-align:middle;line-height:1.35}
-    .muted{color:#6b7280;font-size:12px}
+    th,td{padding:10px 11px;border-bottom:1px solid #e3e9f2;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
+    th{background:#f4f7fb;color:#334155;font-weight:700}
+    .muted{color:#475569;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
     .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
@@ -99,7 +101,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h2>약품관리 시스템 (공유형)</h2>
+  <h2>약품관리 시스템</h2>
   <div class="sticky-tools">
     <div class="top">
       <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
