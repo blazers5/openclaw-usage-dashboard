@@ -8,6 +8,10 @@
 ## Active Queue
 
 ### P1
+- [ ] (DOING) 세션 세분화 운영 적용 (MAIN/WEB-OPS/FILE-OPS/CRON-OPS)
+  - 최근 상태: SESSION_STRATEGY.md 작성, 80% 전환 룰 반영
+  - 완료 조건: 대장님 승인 후 1일 운영/피드백 반영
+
 - [ ] (DOING) 약품관리 시스템 UI/UX 유지보수 (PC/모바일)
   - 최근 상태: 모바일 폰트/정렬 개선 반영 완료, 추가 피드백 대기
   - 완료 조건: 대장님 확인 OK + 추가 수정 0건
