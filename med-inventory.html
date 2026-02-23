@@ -11,28 +11,49 @@
   <meta name="format-detection" content="telephone=no" />
 
   <style>
+    :root {
+      --bg:#e5e7eb;
+      --bg-soft:#f3f4f6;
+      --panel:#ffffff;
+      --panel-2:#f9fafb;
+      --line:#d1d5db;
+      --line-strong:#9ca3af;
+      --text:#111827;
+      --text-soft:#4b5563;
+      --accent:#374151;
+      --accent-strong:#1f2937;
+      --radius:14px;
+    }
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; margin: 0; padding: 16px; background: #f7f7f8; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; margin: 0; padding: 16px; background: linear-gradient(180deg,#f3f4f6 0%,#e5e7eb 100%); color:var(--text); }
     .container { max-width: 1024px; margin: 0 auto; }
-    h1 { font-size: 20px; margin: 0 0 12px; }
+    h1 { font-size: 22px; margin: 0 0 12px; color:var(--accent-strong); letter-spacing:-0.2px; }
     .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 12px; }
-    input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background:var(--panel); }
     .buttons { display:flex; gap:8px; flex-wrap: wrap; }
-    button { padding: 10px 14px; border: 1px solid #ddd; background: white; border-radius: 10px; cursor: pointer; }
+    button { padding: 10px 14px; border: 1px solid var(--line); background: var(--panel); border-radius: 10px; cursor: pointer; color:var(--accent); font-weight:700; }
     button:active { transform: scale(0.98); }
-    .card { background: white; border: 1px solid #eee; border-radius: 14px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #f0f0f0; }
-    th { font-weight: 700; font-size: 14px; color: #333; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; box-shadow: 0 6px 16px rgba(17,24,39,0.05); }
+    table { width: 100%; border-collapse: collapse; table-layout:fixed; }
+    th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid #e5e7eb; }
+    th { font-weight: 800; font-size: 14px; color: var(--accent); background:var(--panel-2); }
     td { font-size: 14px; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fafafa; font-size: 12px; }
-    .muted { color: #6b7280; }
+    code{display:inline-block;padding:2px 6px;border:1px solid var(--line);border-radius:8px;background:#f3f4f6;color:var(--accent-strong);font-weight:800}
+    th:nth-child(1), td:nth-child(1){width:120px; text-align:center; font-weight:800;}
+    th:nth-child(2), td:nth-child(2){width:auto; font-weight:800;}
+    th:nth-child(3), td:nth-child(3){width:170px; font-weight:800; color:var(--accent-strong);}
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12px; font-weight:700; color:var(--accent); }
+    .muted { color: var(--text-soft); }
     .result-meta { display:flex; justify-content:space-between; align-items:center; margin: 10px 0; color: #6b7280; font-size: 13px; gap: 8px; flex-wrap: wrap; }
     .footer { margin-top: 14px; color: #9ca3af; font-size: 12px; text-align:center; }
-    .expiring { background: #fff7ed; }
-    input[type="date"] { padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; }
+    .expiring { background: #f3f4f6; }
+    input[type="date"] { padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background:var(--panel); }
     @media (max-width: 640px) {
-      th:nth-child(3), td:nth-child(3) { display: none; } /* 코드 칼럼은 모바일에서 숨김 */
+      th, td { padding:9px 6px; }
+      th:nth-child(1), td:nth-child(1){width:86px;}
+      th:nth-child(3), td:nth-child(3){width:120px;}
+      th:nth-child(4), td:nth-child(4){width:130px;}
+      th:nth-child(5), td:nth-child(5){width:70px;}
     }
   
     input[type="date"] {
