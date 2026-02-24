@@ -6,6 +6,7 @@
   <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
   <style>
     :root{
       --bg:#e5e7eb;
@@ -656,30 +657,74 @@ function printRangeSheets(){
   setTimeout(()=>w.print(), 200);
 }
 
-function downloadPrintFile(){
-  if(typeof XLSX === 'undefined'){ alert('파일 출력 모듈 로딩 실패. 새로고침 후 다시 시도해주세요.'); return; }
+async function downloadPrintFile(){
   const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
   if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
 
-  const wb = XLSX.utils.book_new();
+  if(typeof ExcelJS === 'undefined'){
+    alert('파일 출력 모듈 로딩이 지연되었습니다. 새로고침 후 다시 시도해주세요.');
+    return;
+  }
+
+  const wb = new ExcelJS.Workbook();
+
   for(let start=1; start<=300; start+=60){
     const end = start + 59;
     const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
     if(!set.length) continue;
 
-    const aoa = [['번호','약품명','약품코드','유효기간']];
-    set.forEach(r=>aoa.push([Number(r.no)||'', r.name||'', r.code||'', r.expiry_date||'']));
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const ws = wb.addWorksheet(`${start}-${end}`, {
+      pageSetup: {
+        paperSize: 9,
+        orientation: 'portrait',
+        margins: { left: 0.2, right: 0.2, top: 0.3, bottom: 0.3, header: 0.15, footer: 0.15 },
+        fitToPage: false,
+        scale: 100,
+        horizontalCentered: false
+      }
+    });
+
     // 7.5cm 폭 기준 근사(번호/약품명/약품코드/유효기간)
-    ws['!cols'] = [ {wch:4}, {wch:14}, {wch:6}, {wch:6} ];
-    // 헤더+데이터 행 높이(출력본 느낌 유지)
-    ws['!rows'] = [{hpx:24}, ...set.map(()=>({hpx:20}))];
-    // 헤더 자동필터
-    ws['!autofilter'] = { ref: `A1:D${set.length+1}` };
-    XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
+    ws.columns = [
+      { header: '번호', key: 'no', width: 4 },
+      { header: '약품명', key: 'name', width: 14 },
+      { header: '약품코드', key: 'code', width: 6 },
+      { header: '유효기간', key: 'exp', width: 6 }
+    ];
+
+    set.forEach(r => ws.addRow({
+      no: Number(r.no) || '',
+      name: r.name || '',
+      code: r.code || '',
+      exp: r.expiry_date || ''
+    }));
+
+    ws.getRow(1).height = 24;
+    ws.getRow(1).eachCell((cell)=>{
+      cell.font = { name:'맑은 고딕', size:9, bold:true };
+      cell.alignment = { vertical:'middle', horizontal:'center' };
+      cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
+    });
+
+    for(let r=2; r<=ws.rowCount; r++){
+      ws.getRow(r).height = 20;
+      ws.getRow(r).eachCell((cell)=>{
+        cell.font = { name:'맑은 고딕', size:8.5 };
+        cell.alignment = { vertical:'middle', horizontal:'center' };
+        cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
+      });
+    }
   }
 
-  XLSX.writeFile(wb, 'medicine-print-range-split-7.5cm.xlsx');
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'medicine-print-range-split-7.5cm.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
 }
 
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
