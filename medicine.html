@@ -148,7 +148,6 @@
   <div class="sticky-tools">
     <div class="top">
       <input id="q" placeholder="약품명/번호/코드 검색" />
-      <button id="printRange">인쇄(1-60 분할)</button>
       <button id="adminAddRow" style="display:none">행 추가</button>
       <button id="adminClearAll" style="display:none">전체 삭제</button>
     </div>
@@ -743,7 +742,7 @@ q.addEventListener('input', render);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
-printRangeBtn.addEventListener('click', printRangeSheets);
+if(printRangeBtn) printRangeBtn.addEventListener('click', printRangeSheets);
 if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
 if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
