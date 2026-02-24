@@ -672,14 +672,14 @@ function downloadPrintFile(){
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     // 7.5cm 폭 기준 근사(번호/약품명/약품코드/유효기간)
     ws['!cols'] = [ {wch:4}, {wch:14}, {wch:6}, {wch:6} ];
+    // 헤더+데이터 행 높이(출력본 느낌 유지)
+    ws['!rows'] = [{hpx:24}, ...set.map(()=>({hpx:20}))];
+    // 헤더 자동필터
+    ws['!autofilter'] = { ref: `A1:D${set.length+1}` };
     XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
   }
 
-  const stamp = new Date();
-  const y = stamp.getFullYear();
-  const m = String(stamp.getMonth()+1).padStart(2,'0');
-  const d = String(stamp.getDate()).padStart(2,'0');
-  XLSX.writeFile(wb, `medicine-print-range-split-${y}${m}${d}.xlsx`);
+  XLSX.writeFile(wb, 'medicine-print-range-split-7.5cm.xlsx');
 }
 
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
