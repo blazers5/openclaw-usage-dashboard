@@ -2,11 +2,15 @@ const card = document.getElementById('sentenceCard');
 const showPron = document.getElementById('showPron');
 const onlyFavorites = document.getElementById('onlyFavorites');
 const favBtn = document.getElementById('favBtn');
+const quizQ = document.getElementById('quizQ');
+const quizOpts = document.getElementById('quizOpts');
+const quizMeta = document.getElementById('quizMeta');
 
 let rows = [];
 let filtered = [];
 let i = 0;
 const favorites = new Set(JSON.parse(localStorage.getItem('jp.fav') || '[]'));
+const quiz = { items: [], idx: 0, score: 0 };
 
 function saveFav(){ localStorage.setItem('jp.fav', JSON.stringify([...favorites])); }
 
@@ -46,6 +50,45 @@ document.getElementById('playBtn').onclick = ()=>{ const r=now(); if(r) speak(r.
 favBtn.onclick = ()=>{ const r=now(); if(!r) return; favorites.has(r.id)?favorites.delete(r.id):favorites.add(r.id); saveFav(); applyFilter(); render(); };
 showPron.onchange = render;
 onlyFavorites.onchange = ()=>{ applyFilter(); render(); };
+
+function buildQuizItems(count=5){
+  const base = [...rows].sort(()=>Math.random()-0.5).slice(0, Math.min(count, rows.length));
+  return base.map(s=>{
+    const wrong = [...rows].filter(x=>x.id!==s.id).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.ko);
+    const opts = [...wrong, s.ko].sort(()=>Math.random()-0.5);
+    return { q: s.jp, a: s.ko, opts };
+  });
+}
+
+function renderQuiz(){
+  const item = quiz.items[quiz.idx];
+  if(!item){
+    quizQ.textContent = `퀴즈 종료: ${quiz.score}/${quiz.items.length}`;
+    quizOpts.innerHTML = '';
+    quizMeta.textContent = '';
+    return;
+  }
+  quizQ.textContent = `Q${quiz.idx+1}. ${item.q}`;
+  quizMeta.textContent = `점수 ${quiz.score} / ${quiz.items.length}`;
+  quizOpts.innerHTML = '';
+  item.opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.textContent=opt;
+    b.onclick=()=>{
+      if(opt===item.a) quiz.score++;
+      quiz.idx++;
+      renderQuiz();
+    };
+    quizOpts.appendChild(b);
+  });
+}
+
+document.getElementById('quizStartBtn').onclick = ()=>{
+  quiz.items = buildQuizItems(5);
+  quiz.idx = 0;
+  quiz.score = 0;
+  renderQuiz();
+};
 
 (async function init(){
   const res = await fetch('./data/sentences.json');

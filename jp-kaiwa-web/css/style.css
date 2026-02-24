@@ -5,3 +5,5 @@ body{font-family:'맑은 고딕',sans-serif;margin:0;background:#0f172a;color:#e
 .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 button{background:#334155;color:#fff;border:0;border-radius:8px;padding:10px 12px;cursor:pointer}
 .small{color:#94a3b8;font-size:13px}
+#quizCard{margin-top:14px}
+#quizOpts button{min-width:140px}
