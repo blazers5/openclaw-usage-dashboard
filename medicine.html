@@ -638,13 +638,13 @@ function printRangeSheets(){
     body{font-family:'Malgun Gothic',sans-serif;margin:0}
     .sheet{height:285mm;page-break-after:always;overflow:hidden}
     .sheet:last-child{page-break-after:auto}
-    .range{font-size:10px;font-weight:700;margin:0 0 1mm 0}
-    table{border-collapse:collapse;width:7.1cm;table-layout:fixed}
-    th,td{border:1px solid #111;padding:0.6mm 0.4mm;font-size:8.5px;height:4mm;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    th:nth-child(1),td:nth-child(1){width:1.3cm}
-    th:nth-child(2),td:nth-child(2){width:3.4cm}
-    th:nth-child(3),td:nth-child(3){width:0.8cm}
-    th:nth-child(4),td:nth-child(4){width:1.6cm}
+    .range{font-size:9px;font-weight:700;margin:0 0 0.5mm 0}
+    table{border-collapse:collapse;width:6.5cm;table-layout:fixed}
+    th,td{border:1px solid #111;padding:0.3mm 0.2mm;font-size:8px;height:3.4mm;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    th:nth-child(1),td:nth-child(1){width:1.2cm}
+    th:nth-child(2),td:nth-child(2){width:3.1cm}
+    th:nth-child(3),td:nth-child(3){width:0.7cm}
+    th:nth-child(4),td:nth-child(4){width:1.5cm}
   </style></head><body>${sections.join('')}</body></html>`;
 
   const w = window.open('', '_blank');
@@ -688,10 +688,10 @@ async function downloadPrintFile(){
 
     // 1~60 한 페이지(세로형) 규격
     ws.columns = [
-      { width: 5.7 },   // 약품코드
-      { width: 13.3 },  // 약품명
-      { width: 3.8 },   // 번호
-      { width: 5.7 }    // 유효기간
+      { width: 5.2 },   // 약품코드
+      { width: 12.2 },  // 약품명
+      { width: 3.5 },   // 번호
+      { width: 5.3 }    // 유효기간
     ];
 
     ws.getCell(1,1).value = '약품코드';
@@ -708,16 +708,16 @@ async function downloadPrintFile(){
     });
 
     const styleCell = (cell, isHeader=false) => {
-      cell.font = { name:'맑은 고딕', size:isHeader ? 9 : 8.5, bold:isHeader };
+      cell.font = { name:'맑은 고딕', size:isHeader ? 8 : 7.5, bold:isHeader };
       cell.alignment = { vertical:'middle', horizontal:'center' };
       cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
     };
 
-    ws.getRow(1).height = 20;
+    ws.getRow(1).height = 11;
     for(let c=1; c<=4; c++) styleCell(ws.getCell(1,c), true);
 
     for(let r=2; r<=set.length+1; r++){
-      ws.getRow(r).height = 18;
+      ws.getRow(r).height = 10;
       for(let c=1; c<=4; c++) styleCell(ws.getCell(r,c), false);
     }
 
