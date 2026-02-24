@@ -670,7 +670,8 @@ function downloadPrintFile(){
     const aoa = [['번호','약품명','약품코드','유효기간']];
     set.forEach(r=>aoa.push([Number(r.no)||'', r.name||'', r.code||'', r.expiry_date||'']));
     const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = [ {wch:6}, {wch:26}, {wch:11}, {wch:12} ];
+    // 7.5cm 폭 기준 근사(번호/약품명/약품코드/유효기간)
+    ws['!cols'] = [ {wch:4}, {wch:14}, {wch:6}, {wch:6} ];
     XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
   }
 
