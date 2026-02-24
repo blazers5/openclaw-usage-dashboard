@@ -5,36 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
+    :root{
+      --bg:#e5e7eb;
+      --bg-soft:#f3f4f6;
+      --panel:#ffffff;
+      --panel-2:#f9fafb;
+      --line:#d1d5db;
+      --line-strong:#9ca3af;
+      --text:#111827;
+      --text-soft:#4b5563;
+      --accent:#374151;
+      --accent-strong:#1f2937;
+      --danger:#7f1d1d;
+      --radius:14px;
+    }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#eef1f4;color:#1f2937;padding:16px;line-height:1.5}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f3f4f6 0%,#e5e7eb 100%);color:var(--text);padding:16px;line-height:1.5}
     .wrap{max-width:1200px;margin:0 auto}
-    h2{margin:0;font-size:28px;letter-spacing:-0.2px;color:#0f172a}
+    h2{margin:0;font-size:28px;letter-spacing:-0.2px;color:var(--accent-strong)}
     .title-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
     .title-actions{display:flex;align-items:center;gap:8px}
-    .icon-btn,.mode-chip{height:42px;min-width:42px;padding:0 14px;border:1px solid #cfd8e3;border-radius:999px;background:#fff;color:#334155;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    .icon-btn,.mode-chip{height:42px;min-width:42px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
     .icon-btn{cursor:pointer}
     .icon-btn .ico{font-size:16px;line-height:1}
     .icon-btn .txt{display:none}
     .icon-btn:hover{background:#f8fbff}
     .mode-chip{background:#f8fafc;color:#475569}
-    .sticky-tools{position:sticky;top:0;z-index:15;background:#eef1f4;padding-top:6px;padding-bottom:6px;max-width:860px;margin:0 auto}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:rgba(243,244,246,.9);backdrop-filter:saturate(180%) blur(8px);padding-top:6px;padding-bottom:6px;max-width:860px;margin:0 auto}
     .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
     input,button{padding:10px;border:1px solid #cfd8e3;border-radius:12px}
     input{font-size:15px;background:#fff;color:#111827}
-    #q{background:#fff;border:1px solid #c7d3e2;box-shadow:0 2px 8px rgba(17,24,39,.06);width:min(860px,100%);min-width:0;height:44px;font-size:16px}
+    #q{background:var(--panel);border:1px solid var(--line);box-shadow:0 4px 12px rgba(17,24,39,.06);width:min(860px,100%);min-width:0;height:44px;font-size:16px}
     button{background:#fff;cursor:pointer;color:#1f2937;font-weight:600}
     #reload{background:#f1f5ff;border-color:#dbe6ff}
     .save-btn[data-action="save"], .save-btn{font-weight:600}
-    button[data-action="save"]{background:#2563eb;color:#fff;border-color:#2563eb}
-    button[data-action="delete"]{background:#fff;color:#b91c1c;border-color:#f2b2b2}
-    table{width:100%;min-width:860px;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;table-layout:fixed}
-    th,td{padding:10px 11px;border-bottom:1px solid #e3e9f2;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
-    th{background:#f4f7fb;color:#334155;font-weight:700}
-    th:nth-child(1), td:nth-child(1){width:72px;text-align:center}
-    th:nth-child(2), td:nth-child(2){width:440px;white-space:normal;word-break:keep-all}
-    th:nth-child(3), td:nth-child(3){width:140px;text-align:center;white-space:nowrap}
-    th:nth-child(4), td:nth-child(4){width:92px;text-align:center}
+    button[data-action="save"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+    button[data-action="delete"]{background:#fff;color:var(--danger);border-color:#fecaca}
+    table{width:100%;min-width:860px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;table-layout:fixed}
+    th,td{padding:11px 12px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
+    th{background:var(--panel-2);color:var(--accent);font-weight:800}
+    th:nth-child(1), td:nth-child(1){width:170px;text-align:center;font-weight:700}
+    th:nth-child(2), td:nth-child(2){width:340px;white-space:normal;word-break:keep-all;font-weight:700}
+    th:nth-child(3), td:nth-child(3){width:170px;text-align:center;white-space:nowrap}
+    th:nth-child(4), td:nth-child(4){width:120px;text-align:center}
     .muted{color:#475569;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
@@ -74,9 +89,9 @@
       td{display:table-cell;padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:9px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       /* 모바일: 번호/약품명 간격 균형 + 유효기간 정렬 개선 */
-      th:nth-child(1), td:nth-child(1){width:42px;padding-right:2px}
-      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:4px; font-size:14.5px;font-weight:600}
-      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap}
+      th:nth-child(1), td:nth-child(1){width:92px;padding-right:4px;font-weight:800}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:6px; font-size:14.5px;font-weight:800}
+      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap;font-weight:700}
       th:nth-child(4), td:nth-child(4){width:52px}
       td[data-label]::before{content:none}
       .cell-input{min-width:0;padding:7px 6px;font-size:12px}
@@ -101,9 +116,9 @@
     .med-card{background:#fff;border:1px solid #e8edf6;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(17,24,39,.04)}
     .med-card.dirty{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.15)}
     .med-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .med-card .num{font-weight:700;font-size:13px;color:#334155;background:#eef2ff;border-radius:999px;padding:3px 8px}
-    .med-card .name{font-weight:700;font-size:17px;line-height:1.25;margin-bottom:2px}
-    .med-card .code{color:#64748b;font-size:12px}
+    .med-card .num{font-weight:800;font-size:15px;color:var(--accent-strong);background:#e5e7eb;border:1px solid #d1d5db;border-radius:999px;padding:4px 10px}
+    .med-card .name{font-weight:800;font-size:17px;line-height:1.25;margin-bottom:2px;color:var(--accent-strong)}
+    .med-card .code{color:var(--accent-strong);font-size:15px;font-weight:800}
     .med-card .expiry{margin-top:8px;font-size:13px}
     .field-label{margin-top:8px;margin-bottom:4px;font-size:12px;color:#64748b;font-weight:600}
     .med-card .actions{margin-top:12px;display:flex;gap:8px}
@@ -113,6 +128,8 @@
     .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
     .modal h3{margin:0 0 10px;font-size:16px}
     .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    .file-print-fab{position:fixed;right:18px;bottom:18px;z-index:50;width:92px;height:92px;border-radius:999px;border:3px solid #7f1d1d;background:#dc2626;color:#fff;font-weight:900;font-size:14px;line-height:1.15;box-shadow:0 12px 28px rgba(127,29,29,.45);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer}
+    .file-print-fab:hover{background:#b91c1c}
   </style>
 </head>
 <body>
@@ -123,12 +140,14 @@
       <button id="adminLogin" class="icon-btn" title="관리자 로그인" aria-label="관리자 로그인"><span class="ico">🔐</span><span class="txt">관리자</span></button>
       <button id="adminLogout" class="icon-btn" style="display:none" title="로그아웃" aria-label="로그아웃"><span class="ico">🔓</span><span class="txt">로그아웃</span></button>
       <span id="mode" class="mode-chip">조회 전용</span>
+      <button id="printQuick" class="icon-btn" title="출력(1-60 분할)" aria-label="출력"><span class="ico">🖨️</span><span class="txt">출력</span></button>
       <button id="reload" class="icon-btn" title="새로고침" aria-label="새로고침"><span class="ico">↻</span><span class="txt">새로고침</span></button>
     </div>
   </div>
   <div class="sticky-tools">
     <div class="top">
       <input id="q" placeholder="약품명/번호/코드 검색" />
+      <button id="printRange">인쇄(1-60 분할)</button>
       <button id="adminAddRow" style="display:none">행 추가</button>
       <button id="adminClearAll" style="display:none">전체 삭제</button>
     </div>
@@ -154,6 +173,7 @@
 
   <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
+<button id="filePrintFab" class="file-print-fab" title="파일로 출력" aria-label="파일로 출력">파일로<br>출력</button>
 
 <div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
   <div class="float-head">
@@ -201,6 +221,9 @@ const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
 const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
+const printRangeBtn = document.getElementById('printRange');
+const printQuickBtn = document.getElementById('printQuick');
+const filePrintFab = document.getElementById('filePrintFab');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
@@ -581,6 +604,83 @@ async function saveRow(e){
   render();
 }
 
+function printRangeSheets(){
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const sections = [];
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+    const body = set.map(r => `
+      <tr>
+        <td>${esc(r.no)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.code)}</td>
+        <td>${esc(r.expiry_date || '')}</td>
+      </tr>`).join('');
+
+    sections.push(`
+      <section class="sheet">
+        <div class="range">${start}-${end}</div>
+        <table>
+          <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </section>
+    `);
+  }
+
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>약품 출력</title>
+  <style>
+    @page { size: A4 portrait; margin: 6mm; }
+    body{font-family:'Malgun Gothic',sans-serif;margin:0}
+    .sheet{page-break-after:always}
+    .sheet:last-child{page-break-after:auto}
+    .range{font-size:11px;font-weight:700;margin:0 0 2mm 0}
+    table{border-collapse:collapse;width:7.5cm;table-layout:fixed}
+    th,td{border:1px solid #111;padding:2px 2px;font-size:10px;height:18px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    th:nth-child(1),td:nth-child(1){width:0.9cm}
+    th:nth-child(2),td:nth-child(2){width:3.4cm}
+    th:nth-child(3),td:nth-child(3){width:1.3cm}
+    th:nth-child(4),td:nth-child(4){width:1.9cm}
+  </style></head><body>${sections.join('')}</body></html>`;
+
+  const w = window.open('', '_blank');
+  if(!w){ alert('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 200);
+}
+
+function downloadPrintFile(){
+  if(typeof XLSX === 'undefined'){ alert('파일 출력 모듈 로딩 실패. 새로고침 후 다시 시도해주세요.'); return; }
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const wb = XLSX.utils.book_new();
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+
+    const aoa = [['번호','약품명','약품코드','유효기간']];
+    set.forEach(r=>aoa.push([Number(r.no)||'', r.name||'', r.code||'', r.expiry_date||'']));
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [ {wch:6}, {wch:26}, {wch:11}, {wch:12} ];
+    XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
+  }
+
+  const stamp = new Date();
+  const y = stamp.getFullYear();
+  const m = String(stamp.getMonth()+1).padStart(2,'0');
+  const d = String(stamp.getDate()).padStart(2,'0');
+  XLSX.writeFile(wb, `medicine-print-range-split-${y}${m}${d}.xlsx`);
+}
+
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
 function closePwModal(){ pwModal.style.display='none'; }
 
@@ -588,6 +688,9 @@ q.addEventListener('input', render);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
+printRangeBtn.addEventListener('click', printRangeSheets);
+if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
+if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
 
