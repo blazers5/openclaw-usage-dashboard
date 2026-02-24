@@ -141,7 +141,7 @@
       <button id="adminLogin" class="icon-btn" title="관리자 로그인" aria-label="관리자 로그인"><span class="ico">🔐</span><span class="txt">관리자</span></button>
       <button id="adminLogout" class="icon-btn" style="display:none" title="로그아웃" aria-label="로그아웃"><span class="ico">🔓</span><span class="txt">로그아웃</span></button>
       <span id="mode" class="mode-chip">조회 전용</span>
-      <button id="printQuick" class="icon-btn" title="출력(1-60 분할)" aria-label="출력"><span class="ico">🖨️</span><span class="txt">출력</span></button>
+      <button id="printQuick" class="icon-btn" title="출력(고정 규격)" aria-label="출력"><span class="ico">🖨️</span><span class="txt">출력</span></button>
       <button id="reload" class="icon-btn" title="새로고침" aria-label="새로고침"><span class="ico">↻</span><span class="txt">새로고침</span></button>
     </div>
   </div>
@@ -743,7 +743,7 @@ loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
 if(printRangeBtn) printRangeBtn.addEventListener('click', printRangeSheets);
-if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
+if(printQuickBtn) printQuickBtn.addEventListener('click', downloadPrintFile);
 if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
