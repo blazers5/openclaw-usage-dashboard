@@ -615,9 +615,9 @@ function printRangeSheets(){
     if(!set.length) continue;
     const body = set.map(r => `
       <tr>
-        <td>${esc(r.code)}</td>
-        <td>${esc(r.name)}</td>
         <td>${esc(r.no)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.code)}</td>
         <td>${esc(r.expiry_date || '')}</td>
       </tr>`).join('');
 
@@ -625,7 +625,7 @@ function printRangeSheets(){
       <section class="sheet">
         <div class="range">${start}-${end}</div>
         <table>
-          <thead><tr><th>약품코드</th><th>약품명</th><th>번호</th><th>유효기간</th></tr></thead>
+          <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th></tr></thead>
           <tbody>${body}</tbody>
         </table>
       </section>
