@@ -639,11 +639,11 @@ function printRangeSheets(){
     .sheet{height:285mm;page-break-after:always;overflow:hidden}
     .sheet:last-child{page-break-after:auto}
     .range{font-size:10px;font-weight:700;margin:0 0 1mm 0}
-    table{border-collapse:collapse;width:7.5cm;table-layout:fixed}
+    table{border-collapse:collapse;width:7.1cm;table-layout:fixed}
     th,td{border:1px solid #111;padding:0.6mm 0.4mm;font-size:8.5px;height:4mm;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    th:nth-child(1),td:nth-child(1){width:1.4cm}
-    th:nth-child(2),td:nth-child(2){width:3.6cm}
-    th:nth-child(3),td:nth-child(3){width:0.9cm}
+    th:nth-child(1),td:nth-child(1){width:1.3cm}
+    th:nth-child(2),td:nth-child(2){width:3.4cm}
+    th:nth-child(3),td:nth-child(3){width:0.8cm}
     th:nth-child(4),td:nth-child(4){width:1.6cm}
   </style></head><body>${sections.join('')}</body></html>`;
 
@@ -688,10 +688,10 @@ async function downloadPrintFile(){
 
     // 1~60 한 페이지(세로형) 규격
     ws.columns = [
-      { width: 6 },   // 약품코드
-      { width: 14 },  // 약품명
-      { width: 4 },   // 번호
-      { width: 6 }    // 유효기간
+      { width: 5.7 },   // 약품코드
+      { width: 13.3 },  // 약품명
+      { width: 3.8 },   // 번호
+      { width: 5.7 }    // 유효기간
     ];
 
     ws.getCell(1,1).value = '약품코드';
