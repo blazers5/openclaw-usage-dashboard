@@ -5,20 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
+    :root{
+      --bg:#e5e7eb;
+      --bg-soft:#f3f4f6;
+      --panel:#ffffff;
+      --panel-2:#f9fafb;
+      --line:#d1d5db;
+      --line-strong:#9ca3af;
+      --text:#111827;
+      --text-soft:#4b5563;
+      --accent:#374151;
+      --accent-strong:#1f2937;
+      --danger:#7f1d1d;
+      --radius:14px;
+    }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:#f6f7fb;padding:14px}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f3f4f6 0%,#e5e7eb 100%);color:var(--text);padding:16px;line-height:1.5}
     .wrap{max-width:1200px;margin:0 auto}
-    .sticky-tools{position:sticky;top:0;z-index:15;background:#f6f7fb;padding-top:6px;padding-bottom:6px}
-    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input,button{padding:10px;border:1px solid #ddd;border-radius:10px}
-    input{font-size:15px}
-    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
-    th,td{padding:9px 10px;border-bottom:1px solid #eef1f6;text-align:left;font-size:14px;vertical-align:middle;line-height:1.35}
-    .muted{color:#6b7280;font-size:12px}
+    h2{margin:0;font-size:28px;letter-spacing:-0.2px;color:var(--accent-strong)}
+    .title-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+    .title-actions{display:flex;align-items:center;gap:8px}
+    .icon-btn,.mode-chip{height:42px;min-width:42px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    .icon-btn{cursor:pointer}
+    .icon-btn .ico{font-size:16px;line-height:1}
+    .icon-btn .txt{display:none}
+    .icon-btn:hover{background:#f8fbff}
+    .mode-chip{background:#f8fafc;color:#475569}
+    .sticky-tools{position:sticky;top:0;z-index:15;background:rgba(243,244,246,.9);backdrop-filter:saturate(180%) blur(8px);padding-top:6px;padding-bottom:6px;max-width:860px;margin:0 auto}
+    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+    input,button{padding:10px;border:1px solid #cfd8e3;border-radius:12px}
+    input{font-size:15px;background:#fff;color:#111827}
+    #q{background:var(--panel);border:1px solid var(--line);box-shadow:0 4px 12px rgba(17,24,39,.06);width:min(860px,100%);min-width:0;height:44px;font-size:16px}
+    button{background:#fff;cursor:pointer;color:#1f2937;font-weight:600}
+    #reload{background:#f1f5ff;border-color:#dbe6ff}
+    .save-btn[data-action="save"], .save-btn{font-weight:600}
+    button[data-action="save"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+    button[data-action="delete"]{background:#fff;color:var(--danger);border-color:#fecaca}
+    table{width:100%;min-width:860px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;table-layout:fixed}
+    th,td{padding:11px 12px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
+    th{background:var(--panel-2);color:var(--accent);font-weight:800}
+    th:nth-child(1), td:nth-child(1){width:170px;text-align:center;font-weight:700}
+    th:nth-child(2), td:nth-child(2){width:340px;white-space:normal;word-break:keep-all;font-weight:700}
+    th:nth-child(3), td:nth-child(3){width:170px;text-align:center;white-space:nowrap}
+    th:nth-child(4), td:nth-child(4){width:120px;text-align:center}
+    .muted{color:#475569;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
-    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch;max-width:860px;margin:10px auto 0}
     .footer{margin-top:10px;color:#666;font-size:12px}
     .cell-input{width:100%;min-width:96px;padding:8px;font-size:13px}
     .save-btn{padding:6px 10px;font-size:12px}
@@ -29,12 +64,18 @@
     .ok{color:#0f766e}.err{color:#b91c1c}
 
     @media (max-width: 768px){
-      h2{font-size:30px;margin-bottom:10px}
+      h2{font-size:24px}
+      .title-bar{align-items:flex-start;gap:8px;flex-direction:column}
+      .title-actions{width:100%;justify-content:flex-end;gap:6px}
+      .icon-btn,.mode-chip{height:38px;padding:0 10px}
+      #q{height:42px;font-size:15px}
       .top{display:grid;grid-template-columns:1fr auto;gap:8px}
       #q{grid-column:1 / -1}
       table{min-width:700px}
-      th,td{font-size:13px;padding:8px}
+      th,td{font-size:13px;padding:9px}
       .save-btn{padding:9px 10px}
+      #tableWrap{display:none}
+      #cardList{display:flex !important}
     }
 
     @media (max-width: 900px){
@@ -45,17 +86,19 @@
       thead{display:table-header-group}
       tbody{display:table-row-group}
       tr{display:table-row}
-      td{display:table-cell;padding:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      th{font-size:12px;padding:8px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      /* 모바일: 번호/약품명 간격 축소 + 유효기간 선명하게 */
-      th:nth-child(1), td:nth-child(1){width:30px;padding-right:2px}
-      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.35; padding-left:2px}
-      th:nth-child(3), td:nth-child(3){width:108px; text-align:right; white-space:nowrap}
-      th:nth-child(4), td:nth-child(4){width:66px}
+      td{display:table-cell;padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      th{font-size:12px;padding:9px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      /* 모바일: 번호/약품명 간격 균형 + 유효기간 정렬 개선 */
+      th:nth-child(1), td:nth-child(1){width:92px;padding-right:4px;font-weight:800}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:6px; font-size:14.5px;font-weight:800}
+      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap;font-weight:700}
+      th:nth-child(4), td:nth-child(4){width:52px}
       td[data-label]::before{content:none}
-      .cell-input{min-width:64px;padding:6px 6px;font-size:12px}
-      .save-wrap{justify-content:flex-start;gap:4px}
-      .save-btn{min-width:50px;padding:6px 7px;font-size:11px}
+      .cell-input{min-width:0;padding:7px 6px;font-size:12px}
+      td:nth-child(1) .cell-input{width:100%;padding:7px 4px;text-align:center}
+      td:nth-child(3) .cell-input{width:100%;padding:7px 2px;font-size:11px;text-align:center}
+      .save-wrap{display:flex;flex-direction:column;justify-content:flex-start;gap:3px;align-items:stretch}
+      .save-btn{width:100%;min-width:0;padding:4px 3px;font-size:10px;line-height:1.1}
       .footer{font-size:11px}
     }
 
@@ -69,30 +112,50 @@
     .drug-snippet{display:block;color:#4b5563;font-size:12px;margin-top:4px;line-height:1.4}
     .drug-actions{display:flex;justify-content:flex-end;margin-top:8px}
 
+    .card-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .med-card{background:#fff;border:1px solid #e8edf6;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(17,24,39,.04)}
+    .med-card.dirty{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.15)}
+    .med-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .med-card .num{font-weight:800;font-size:15px;color:var(--accent-strong);background:#e5e7eb;border:1px solid #d1d5db;border-radius:999px;padding:4px 10px}
+    .med-card .name{font-weight:800;font-size:17px;line-height:1.25;margin-bottom:2px;color:var(--accent-strong)}
+    .med-card .code{color:var(--accent-strong);font-size:15px;font-weight:800}
+    .med-card .expiry{margin-top:8px;font-size:13px}
+    .field-label{margin-top:8px;margin-bottom:4px;font-size:12px;color:#64748b;font-weight:600}
+    .med-card .actions{margin-top:12px;display:flex;gap:8px}
+    .med-card .actions button{flex:1;height:38px;font-size:13px}
+
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
     .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
     .modal h3{margin:0 0 10px;font-size:16px}
     .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    .file-print-fab{position:fixed;right:18px;bottom:18px;z-index:50;width:92px;height:92px;border-radius:999px;border:3px solid #7f1d1d;background:#dc2626;color:#fff;font-weight:900;font-size:14px;line-height:1.15;box-shadow:0 12px 28px rgba(127,29,29,.45);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer}
+    .file-print-fab:hover{background:#b91c1c}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h2>약품관리 시스템 (공유형)</h2>
+  <div class="title-bar" style="max-width:860px;margin:0 auto 12px;">
+    <h2>약품관리 시스템</h2>
+    <div class="title-actions">
+      <button id="adminLogin" class="icon-btn" title="관리자 로그인" aria-label="관리자 로그인"><span class="ico">🔐</span><span class="txt">관리자</span></button>
+      <button id="adminLogout" class="icon-btn" style="display:none" title="로그아웃" aria-label="로그아웃"><span class="ico">🔓</span><span class="txt">로그아웃</span></button>
+      <span id="mode" class="mode-chip">조회 전용</span>
+      <button id="printQuick" class="icon-btn" title="출력(1-60 분할)" aria-label="출력"><span class="ico">🖨️</span><span class="txt">출력</span></button>
+      <button id="reload" class="icon-btn" title="새로고침" aria-label="새로고침"><span class="ico">↻</span><span class="txt">새로고침</span></button>
+    </div>
+  </div>
   <div class="sticky-tools">
     <div class="top">
-      <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
-      <button id="adminLogin">관리자 로그인</button>
-      <button id="adminLogout" style="display:none">로그아웃</button>
+      <input id="q" placeholder="약품명/번호/코드 검색" />
+      <button id="printRange">인쇄(1-60 분할)</button>
       <button id="adminAddRow" style="display:none">행 추가</button>
       <button id="adminClearAll" style="display:none">전체 삭제</button>
-      <span id="mode" class="pill">조회 전용</span>
-      <button id="reload">새로고침</button>
     </div>
 
     <div class="row muted" id="status">연결 중...</div>
   </div>
 
-  <div class="row table-wrap">
+  <div class="row table-wrap" id="tableWrap">
     <table>
       <thead>
         <tr>
@@ -106,8 +169,11 @@
     </table>
   </div>
 
+  <div id="cardList" class="card-list" style="display:none"></div>
+
   <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
+<button id="filePrintFab" class="file-print-fab" title="파일로 출력" aria-label="파일로 출력">파일로<br>출력</button>
 
 <div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
   <div class="float-head">
@@ -149,14 +215,22 @@ const tb = document.getElementById('tb');
 const q = document.getElementById('q');
 const statusEl = document.getElementById('status');
 const modeEl = document.getElementById('mode');
+const tableWrap = document.getElementById('tableWrap');
+const cardList = document.getElementById('cardList');
 const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
 const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
+const printRangeBtn = document.getElementById('printRange');
+const printQuickBtn = document.getElementById('printQuick');
+const filePrintFab = document.getElementById('filePrintFab');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
-const NAVER_PROXY_ENDPOINT = '/api/naver-search';
-const NAVER_FALLBACK_PROXY = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
+const NAVER_PROXY_ENDPOINTS = [
+  '/api/naver-search',
+  'https://dedda587d0cff3.lhr.life/api/naver-search'
+];
+const NAVER_READABLE_SEARCH = 'https://r.jina.ai/http://search.naver.com/search.naver?where=nexearch&query=';
 const drugFloat = document.getElementById('drugFloat');
 const drugFloatTitle = document.getElementById('drugFloatTitle');
 const drugFloatClose = document.getElementById('drugFloatClose');
@@ -167,7 +241,15 @@ const drugFloatOpenNaver = document.getElementById('drugFloatOpenNaver');
 
 function nfc(v){ return String(v ?? '').normalize('NFC').trim(); }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function dday(d){ if(!d) return '—'; const t = new Date(d); if(isNaN(t)) return '—'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
+function normalizeDateInput(v){
+  const s = nfc(v).replace(/\D/g,'');
+  if(s.length !== 6) return s;
+  const yy = s.slice(0,2);
+  const mm = s.slice(2,4);
+  const dd = s.slice(4,6);
+  return `20${yy}-${mm}-${dd}`;
+}
+function dday(d){ if(!d) return '-'; const t = new Date(d); if(isNaN(t)) return '-'; const now = new Date(); now.setHours(0,0,0,0); const diff = Math.floor((t-now)/(1000*60*60*24)); return diff>=0 ? `D-${diff}` : '만료'; }
 
 function setMode(){
   modeEl.textContent = isAdmin ? '관리자 편집 가능' : '조회 전용';
@@ -182,8 +264,8 @@ function rowView(r){
     return `
       <tr data-id="${r.id}">
         <td data-label="번호">${r.no}</td>
-        <td data-label="약품명"><button type="button" class="med-link" data-name="${esc(r.name)}">${esc(r.name)}</button> <span class="muted">(${esc(r.code)})</span></td>
-        <td data-label="유효기간">${r.expiry_date || '—'}</td>
+        <td data-label="약품명"><b>${esc(r.name)}</b> <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="유효기간">${r.expiry_date || '-'}</td>
         <td data-label="저장" class="muted">-</td>
       </tr>`;
   }
@@ -196,7 +278,7 @@ function rowView(r){
         <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
         <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
       </td>
-      <td data-label="유효기간"><input class="cell-input" type="date" data-field="expiry_date" value="${esc(r.expiry_date || '')}" /></td>
+      <td data-label="유효기간"><input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" /></td>
       <td data-label="저장">
         <div class="save-wrap">
           <button class="save-btn" data-action="save">저장</button>
@@ -208,22 +290,55 @@ function rowView(r){
 
 function stripHtml(text){ return String(text ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
 
-function parseJinaFallback(text){
-  const lines = String(text || '').split(/\r?\n/).map(v => v.trim()).filter(Boolean);
-  const links = [];
+function isJunkResult(title, link){
+  const t = String(title || '').trim().toLowerCase();
+  const l = String(link || '').toLowerCase();
+  if(!t || !l) return true;
+  if(t === '_naver_' || t === '@naver.com') return true;
+  if(/내\s*페이|n\s*pay|메일|블로그|카페|알림|네이버톡|my|pay|mail|blog|cafe/i.test(t)) return true;
+  if(/help\.naver\.com|policy\.naver\.com|nid\.naver\.com/i.test(l)) return true;
+  if(/\/mail|\/blog|\/cafe|\/pay|\/talk|\/mypage|\/my\//i.test(l)) return true;
+  return false;
+}
+
+function parseJinaFallback(text, qText){
+  const raw = String(text || '');
+  const out = [];
   const seen = new Set();
-  for(const line of lines){
-    const m = line.match(/https?:\/\/[^\s)]+/);
-    if(!m) continue;
-    const link = m[0];
-    if(!/naver\.com|blog\.naver\.com|post\.naver\.com|kin\.naver\.com|news\.naver\.com|youtu\.be|youtube\.com|\./i.test(link)) continue;
+  const qLower = String(qText || '').toLowerCase();
+
+  const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+  let m;
+  while((m = re.exec(raw)) !== null){
+    const title = stripHtml(m[1] || '').trim();
+    const link = m[2] || '';
+    if(!title || !link) continue;
+    if(isJunkResult(title, link)) continue;
+    if(qLower && !(`${title} ${link}`.toLowerCase().includes(qLower))) continue;
     if(seen.has(link)) continue;
     seen.add(link);
-    const title = line.replace(/^[\-\*\d\.\)\s]+/, '').replace(link, '').trim() || link;
-    links.push({ title, link, snippet: '네이버 검색 대체 경로 결과' });
-    if(links.length >= 8) break;
+    out.push({ title, link, snippet: '네이버 검색 결과' });
+    if(out.length >= 8) break;
   }
-  return links;
+
+  return out;
+}
+
+function sanitizeResults(items, qText, qEncoded){
+  const badRe = /SecurityCompromiseError|blocked until|Too many domains|DDos|Anonymous access|\{\s*"?data"?\s*:/i;
+  const qLower = String(qText || '').toLowerCase();
+  const safe = (Array.isArray(items) ? items : []).filter(item => {
+    const title = stripHtml(item?.title || '');
+    const snippet = stripHtml(item?.snippet || item?.description || '');
+    const link = String(item?.link || '');
+    if(!/^https?:\/\//i.test(link)) return false;
+    if(isJunkResult(title, link)) return false;
+    if(badRe.test(title) || badRe.test(snippet)) return false;
+    if(title.trim().startsWith('{') || snippet.trim().startsWith('{')) return false;
+    if(qLower && !(`${title} ${snippet} ${link}`.toLowerCase().includes(qLower))) return false;
+    return true;
+  });
+  return safe.length ? safe : buildGuaranteedResults(qEncoded, qText);
 }
 
 function renderDrugResults(items){
@@ -240,23 +355,51 @@ function renderDrugResults(items){
 }
 
 async function fetchProxyResults(q){
-  const res = await fetch(`${NAVER_PROXY_ENDPOINT}?q=${q}`);
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json();
-  return json.results || [];
+  let lastError = null;
+  for(const endpoint of NAVER_PROXY_ENDPOINTS){
+    try {
+      const res = await fetch(`${endpoint}?q=${q}`);
+      if(!res.ok) { lastError = new Error(`HTTP ${res.status}`); continue; }
+      const json = await res.json();
+      if(Array.isArray(json.results)) return json.results;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError || new Error('proxy_unavailable');
 }
 
-async function fetchFallbackResults(q){
-  const res = await fetch(`${NAVER_FALLBACK_PROXY}${q}`);
-  if(!res.ok) throw new Error(`FALLBACK_HTTP ${res.status}`);
-  const text = await res.text();
-  return parseJinaFallback(text);
+function buildGuaranteedResults(qEncoded, qText){
+  const name = qText || '약품';
+  return [
+    {
+      title: `${name} 네이버 통합검색`,
+      link: `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`,
+      snippet: '약품명 검색 결과를 엽니다.'
+    },
+    {
+      title: `${name} 의약품 정보 검색`,
+      link: `https://terms.naver.com/search.naver?query=${qEncoded}`,
+      snippet: '의약품/성분 관련 정보 검색 결과를 엽니다.'
+    }
+  ];
+}
+
+async function fetchFallbackResults(qEncoded, qText){
+  try {
+    const res = await fetch(`${NAVER_READABLE_SEARCH}${qEncoded}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = parseJinaFallback(text, qText);
+    if(parsed.length) return parsed;
+  } catch {}
+  return buildGuaranteedResults(qEncoded, qText);
 }
 
 async function openDrugInfo(name){
   const qText = nfc(name);
-  const q = encodeURIComponent(qText);
-  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${q}`;
+  const qEncoded = encodeURIComponent(qText);
+  const naverUrl = `https://search.naver.com/search.naver?where=nexearch&query=${qEncoded}`;
   drugFloatTitle.textContent = `약품 정보: ${qText}`;
   drugFloatOpenNaver.href = naverUrl;
   drugFloat.style.display = 'block';
@@ -265,12 +408,12 @@ async function openDrugInfo(name){
   drugFloatList.innerHTML = '';
 
   try {
-    const results = await fetchProxyResults(q);
+    const results = sanitizeResults(await fetchProxyResults(qEncoded), qText, qEncoded);
     if(results.length > 0){
       renderDrugResults(results);
       return;
     }
-    const fallback = await fetchFallbackResults(q);
+    const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
     renderDrugResults(fallback);
     if(fallback.length){
       drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
@@ -278,7 +421,7 @@ async function openDrugInfo(name){
     }
   } catch (err) {
     try {
-      const fallback = await fetchFallbackResults(q);
+      const fallback = sanitizeResults(await fetchFallbackResults(qEncoded, qText), qText, qEncoded);
       renderDrugResults(fallback);
       if(fallback.length){
         drugFloatError.textContent = '프록시 미연결 상태로 대체 검색 결과를 표시했습니다.';
@@ -287,9 +430,10 @@ async function openDrugInfo(name){
         throw new Error('fallback-empty');
       }
     } catch {
-      drugFloatError.textContent = '검색 결과를 가져오지 못했습니다. 원문 열기로 확인해주세요.';
+      const guaranteed = buildGuaranteedResults(qEncoded, qText);
+      renderDrugResults(guaranteed);
+      drugFloatError.textContent = '실시간 결과 수집이 지연되어 대체 검색 카드를 표시했습니다.';
       drugFloatError.style.display = 'block';
-      drugFloatList.innerHTML = '<li class="muted">지금은 네이버 원문 열기만 사용할 수 있습니다.</li>';
     }
   } finally {
     drugFloatLoading.style.display = 'none';
@@ -304,13 +448,63 @@ function closeDrugInfo(){
   drugFloatOpenNaver.removeAttribute('href');
 }
 
+function cardView(r){
+  if(!isAdmin){
+    return `
+      <div class="med-card" data-id="${r.id}">
+        <div class="head"><span class="num">#${r.no}</span></div>
+        <div class="name">${esc(r.name)}</div>
+        <div class="code">코드: ${esc(r.code)}</div>
+        <div class="expiry">유효기간: ${esc(r.expiry_date || '-')}</div>
+        <div class="actions"></div>
+      </div>`;
+  }
+
+  return `
+    <div class="med-card" data-id="${r.id}">
+      <div class="head"><span class="num">#${r.no}</span></div>
+      <div class="field-label">번호</div>
+      <input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" />
+      <div class="field-label">약품명</div>
+      <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:2px" />
+      <div class="field-label">약품코드</div>
+      <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:2px" />
+      <div class="field-label">유효기간 (yymmdd)</div>
+      <input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" style="margin-top:2px" />
+      <div class="actions">
+        <button class="save-btn" data-action="save">저장</button>
+        <button class="save-btn" data-action="delete" style="border-color:#f1b5b5;color:#b91c1c">삭제</button>
+      </div>
+    </div>`;
+}
+
+function bindActions(root){
+  root.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
+  root.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
+  root.querySelectorAll('.med-card .cell-input').forEach(inp => {
+    inp.addEventListener('input', (e)=>{
+      const card = e.target.closest('.med-card');
+      if(card) card.classList.add('dirty');
+    });
+  });
+}
+
 function render(){
   const k = nfc(q.value).toLowerCase();
   const filtered = rows.filter(r => !k || String(r.no).includes(k) || nfc(r.name).toLowerCase().includes(k) || nfc(r.code).toLowerCase().includes(k));
-  tb.innerHTML = filtered.map(rowView).join('');
-  tb.querySelectorAll('.med-link').forEach(btn => btn.addEventListener('click', () => openDrugInfo(btn.dataset.name || '')));
-  tb.querySelectorAll('button[data-action="save"]').forEach(btn => btn.addEventListener('click', saveRow));
-  tb.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', deleteRow));
+
+  const mobile = window.matchMedia('(max-width: 768px)').matches;
+  if(mobile){
+    tableWrap.style.display = 'none';
+    cardList.style.display = 'flex';
+    cardList.innerHTML = filtered.map(cardView).join('');
+    bindActions(cardList);
+  } else {
+    cardList.style.display = 'none';
+    tableWrap.style.display = 'block';
+    tb.innerHTML = filtered.map(rowView).join('');
+    bindActions(tb);
+  }
 }
 
 async function loadData(){
@@ -331,7 +525,7 @@ async function loadData(){
 
 async function deleteRow(e){
   if(!confirm('이 행을 삭제할까요?')) return;
-  const tr = e.target.closest('tr');
+  const tr = e.target.closest('tr, .med-card');
   const id = tr.dataset.id;
   const { error } = await db.from('medicine_inventory').delete().eq('id', id);
   if(error){
@@ -386,16 +580,17 @@ async function addRow(){
 }
 
 async function saveRow(e){
-  const tr = e.target.closest('tr');
+  const tr = e.target.closest('tr, .med-card');
   const id = tr.dataset.id;
   const no = Number(nfc(tr.querySelector('[data-field="no"]').value));
   const name = nfc(tr.querySelector('[data-field="name"]').value);
   const code = nfc(tr.querySelector('[data-field="code"]').value);
-  const expiry = nfc(tr.querySelector('[data-field="expiry_date"]').value);
+  const expiry = normalizeDateInput(tr.querySelector('[data-field="expiry_date"]').value);
 
   if(!Number.isFinite(no) || no <= 0){ alert('번호는 1 이상의 숫자로 입력해주세요.'); return; }
   if(!name){ alert('약품명은 비워둘 수 없습니다.'); return; }
   if(!code){ alert('약품코드는 비워둘 수 없습니다.'); return; }
+  if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){ alert('유효기간은 yymmdd 형식으로 입력해주세요. (예: 280131)'); return; }
 
   const payload = { no, name, code, expiry_date: expiry || null };
   const { error } = await db.from('medicine_inventory').update(payload).eq('id', id);
@@ -409,6 +604,83 @@ async function saveRow(e){
   render();
 }
 
+function printRangeSheets(){
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const sections = [];
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+    const body = set.map(r => `
+      <tr>
+        <td>${esc(r.no)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.code)}</td>
+        <td>${esc(r.expiry_date || '')}</td>
+      </tr>`).join('');
+
+    sections.push(`
+      <section class="sheet">
+        <div class="range">${start}-${end}</div>
+        <table>
+          <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </section>
+    `);
+  }
+
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>약품 출력</title>
+  <style>
+    @page { size: A4 portrait; margin: 6mm; }
+    body{font-family:'Malgun Gothic',sans-serif;margin:0}
+    .sheet{page-break-after:always}
+    .sheet:last-child{page-break-after:auto}
+    .range{font-size:11px;font-weight:700;margin:0 0 2mm 0}
+    table{border-collapse:collapse;width:7.5cm;table-layout:fixed}
+    th,td{border:1px solid #111;padding:2px 2px;font-size:10px;height:18px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    th:nth-child(1),td:nth-child(1){width:0.9cm}
+    th:nth-child(2),td:nth-child(2){width:3.4cm}
+    th:nth-child(3),td:nth-child(3){width:1.3cm}
+    th:nth-child(4),td:nth-child(4){width:1.9cm}
+  </style></head><body>${sections.join('')}</body></html>`;
+
+  const w = window.open('', '_blank');
+  if(!w){ alert('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 200);
+}
+
+function downloadPrintFile(){
+  if(typeof XLSX === 'undefined'){ alert('파일 출력 모듈 로딩 실패. 새로고침 후 다시 시도해주세요.'); return; }
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const wb = XLSX.utils.book_new();
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+
+    const aoa = [['번호','약품명','약품코드','유효기간']];
+    set.forEach(r=>aoa.push([Number(r.no)||'', r.name||'', r.code||'', r.expiry_date||'']));
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [ {wch:6}, {wch:26}, {wch:11}, {wch:12} ];
+    XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
+  }
+
+  const stamp = new Date();
+  const y = stamp.getFullYear();
+  const m = String(stamp.getMonth()+1).padStart(2,'0');
+  const d = String(stamp.getDate()).padStart(2,'0');
+  XLSX.writeFile(wb, `medicine-print-range-split-${y}${m}${d}.xlsx`);
+}
+
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
 function closePwModal(){ pwModal.style.display='none'; }
 
@@ -416,6 +688,9 @@ q.addEventListener('input', render);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
+printRangeBtn.addEventListener('click', printRangeSheets);
+if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
+if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
 
