@@ -7,14 +7,17 @@ const favBtn = document.getElementById('favBtn');
 const quizQ = document.getElementById('quizQ');
 const quizOpts = document.getElementById('quizOpts');
 const quizMeta = document.getElementById('quizMeta');
+const ttsRateSelect = document.getElementById('ttsRate');
 
 let rows = [];
 let filtered = [];
 let i = 0;
 const favorites = new Set(JSON.parse(localStorage.getItem('jp.fav') || '[]'));
+const settings = JSON.parse(localStorage.getItem('jp.settings') || '{"showPron":true,"ttsRate":1}');
 const quiz = { items: [], idx: 0, score: 0 };
 
 function saveFav(){ localStorage.setItem('jp.fav', JSON.stringify([...favorites])); }
+function saveSettings(){ localStorage.setItem('jp.settings', JSON.stringify(settings)); }
 
 function now(){ return filtered[i] || null; }
 
@@ -33,7 +36,8 @@ function applyFilter(){
     if (!query) return true;
     const jp = normalize(x.jp);
     const ko = normalize(x.ko);
-    return jp.includes(query) || ko.includes(query);
+    const pron = normalize(x.pron || '');
+    return jp.includes(query) || ko.includes(query) || pron.includes(query);
   });
 
   if(i >= filtered.length) i = 0;
@@ -63,7 +67,7 @@ function speak(text){
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'ja-JP';
-  u.rate = 1.0;
+  u.rate = Number(settings.ttsRate || 1);
   window.speechSynthesis.speak(u);
 }
 
@@ -82,15 +86,18 @@ document.getElementById('prevBtn').onclick = ()=>{ if(!filtered.length) return; 
 document.getElementById('nextBtn').onclick = ()=>{ if(!filtered.length) return; i=(i+1)%filtered.length; render(); };
 document.getElementById('playBtn').onclick = ()=>{ const r=now(); if(r) speak(r.jp); };
 favBtn.onclick = ()=>{ const r=now(); if(!r) return; favorites.has(r.id)?favorites.delete(r.id):favorites.add(r.id); saveFav(); applyFilter(); render(); };
-showPron.onchange = render;
+showPron.onchange = ()=>{ settings.showPron = showPron.checked; saveSettings(); render(); };
 onlyFavorites.onchange = ()=>{ applyFilter(); render(); };
+
+ttsRateSelect.onchange = ()=>{ settings.ttsRate = Number(ttsRateSelect.value || 1); saveSettings(); };
 categoryFilter.onchange = ()=>{ applyFilter(); render(); };
 searchInput.oninput = ()=>{ applyFilter(); render(); };
 
 function buildQuizItems(count=5){
-  const base = [...rows].sort(()=>Math.random()-0.5).slice(0, Math.min(count, rows.length));
+  const source = filtered.length ? filtered : rows;
+  const base = [...source].sort(()=>Math.random()-0.5).slice(0, Math.min(count, source.length));
   return base.map(s=>{
-    const wrong = [...rows].filter(x=>x.id!==s.id).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.ko);
+    const wrong = [...source].filter(x=>x.id!==s.id).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.ko);
     const opts = [...wrong, s.ko].sort(()=>Math.random()-0.5);
     return { q: s.jp, a: s.ko, opts };
   });
@@ -130,6 +137,10 @@ document.getElementById('quizStartBtn').onclick = ()=>{
   const res = await fetch('./data/sentences.json');
   const json = await res.json();
   rows = json.sentences || [];
+
+  showPron.checked = settings.showPron !== false;
+  ttsRateSelect.value = String(settings.ttsRate || 1);
+
   populateCategories();
   applyFilter();
   render();
