@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>약품관리 시스템 (Supabase)</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
       --bg:#e5e7eb;
@@ -127,6 +128,8 @@
     .modal{width:min(92vw,360px);background:#fff;border-radius:12px;padding:16px;border:1px solid #eee}
     .modal h3{margin:0 0 10px;font-size:16px}
     .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    .file-print-fab{position:fixed;right:18px;bottom:18px;z-index:50;width:92px;height:92px;border-radius:999px;border:3px solid #7f1d1d;background:#dc2626;color:#fff;font-weight:900;font-size:14px;line-height:1.15;box-shadow:0 12px 28px rgba(127,29,29,.45);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer}
+    .file-print-fab:hover{background:#b91c1c}
   </style>
 </head>
 <body>
@@ -170,6 +173,7 @@
 
   <div class="footer">기본 조회 전용 / 관리자 로그인 시 번호·약품명·약품코드·유효기간 모두 편집 후 행 단위 저장 가능</div>
 </div>
+<button id="filePrintFab" class="file-print-fab" title="파일로 출력" aria-label="파일로 출력">파일로<br>출력</button>
 
 <div id="drugFloat" class="float-wrap" role="dialog" aria-modal="true" aria-label="약품 검색 결과">
   <div class="float-head">
@@ -219,6 +223,7 @@ const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
 const printRangeBtn = document.getElementById('printRange');
 const printQuickBtn = document.getElementById('printQuick');
+const filePrintFab = document.getElementById('filePrintFab');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
@@ -651,6 +656,31 @@ function printRangeSheets(){
   setTimeout(()=>w.print(), 200);
 }
 
+function downloadPrintFile(){
+  if(typeof XLSX === 'undefined'){ alert('파일 출력 모듈 로딩 실패. 새로고침 후 다시 시도해주세요.'); return; }
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const wb = XLSX.utils.book_new();
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+
+    const aoa = [['번호','약품명','약품코드','유효기간']];
+    set.forEach(r=>aoa.push([Number(r.no)||'', r.name||'', r.code||'', r.expiry_date||'']));
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [ {wch:6}, {wch:26}, {wch:11}, {wch:12} ];
+    XLSX.utils.book_append_sheet(wb, ws, `${start}-${end}`);
+  }
+
+  const stamp = new Date();
+  const y = stamp.getFullYear();
+  const m = String(stamp.getMonth()+1).padStart(2,'0');
+  const d = String(stamp.getDate()).padStart(2,'0');
+  XLSX.writeFile(wb, `medicine-print-range-split-${y}${m}${d}.xlsx`);
+}
+
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
 function closePwModal(){ pwModal.style.display='none'; }
 
@@ -660,6 +690,7 @@ logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeIt
 document.getElementById('reload').addEventListener('click', loadData);
 printRangeBtn.addEventListener('click', printRangeSheets);
 if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
+if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
 
