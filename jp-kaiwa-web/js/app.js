@@ -1,6 +1,8 @@
 const card = document.getElementById('sentenceCard');
 const showPron = document.getElementById('showPron');
 const onlyFavorites = document.getElementById('onlyFavorites');
+const categoryFilter = document.getElementById('categoryFilter');
+const searchInput = document.getElementById('searchInput');
 const favBtn = document.getElementById('favBtn');
 const quizQ = document.getElementById('quizQ');
 const quizOpts = document.getElementById('quizOpts');
@@ -16,14 +18,35 @@ function saveFav(){ localStorage.setItem('jp.fav', JSON.stringify([...favorites]
 
 function now(){ return filtered[i] || null; }
 
+function normalize(str = '') {
+  return str.toLowerCase().trim();
+}
+
 function applyFilter(){
-  filtered = onlyFavorites.checked ? rows.filter(x=>favorites.has(x.id)) : [...rows];
+  const selectedCategory = categoryFilter.value;
+  const query = normalize(searchInput.value);
+
+  filtered = rows.filter((x) => {
+    if (onlyFavorites.checked && !favorites.has(x.id)) return false;
+    if (selectedCategory !== 'all' && x.category !== selectedCategory) return false;
+
+    if (!query) return true;
+    const jp = normalize(x.jp);
+    const ko = normalize(x.ko);
+    return jp.includes(query) || ko.includes(query);
+  });
+
   if(i >= filtered.length) i = 0;
 }
 
 function render(){
   const r = now();
-  if(!r){ card.innerHTML = '<p>표시할 문장이 없습니다.</p>'; return; }
+  if(!r){
+    favBtn.textContent = '☆ 즐겨찾기';
+    card.innerHTML = '<p>조건에 맞는 문장이 없습니다.</p>';
+    return;
+  }
+
   const isFav = favorites.has(r.id);
   favBtn.textContent = isFav ? '★ 즐겨찾기' : '☆ 즐겨찾기';
 
@@ -44,12 +67,25 @@ function speak(text){
   window.speechSynthesis.speak(u);
 }
 
+function populateCategories(){
+  const categories = [...new Set(rows.map((x) => x.category))];
+  categoryFilter.innerHTML = '<option value="all">전체</option>';
+  categories.forEach((category) => {
+    const opt = document.createElement('option');
+    opt.value = category;
+    opt.textContent = category;
+    categoryFilter.appendChild(opt);
+  });
+}
+
 document.getElementById('prevBtn').onclick = ()=>{ if(!filtered.length) return; i=(i-1+filtered.length)%filtered.length; render(); };
 document.getElementById('nextBtn').onclick = ()=>{ if(!filtered.length) return; i=(i+1)%filtered.length; render(); };
 document.getElementById('playBtn').onclick = ()=>{ const r=now(); if(r) speak(r.jp); };
 favBtn.onclick = ()=>{ const r=now(); if(!r) return; favorites.has(r.id)?favorites.delete(r.id):favorites.add(r.id); saveFav(); applyFilter(); render(); };
 showPron.onchange = render;
 onlyFavorites.onchange = ()=>{ applyFilter(); render(); };
+categoryFilter.onchange = ()=>{ applyFilter(); render(); };
+searchInput.oninput = ()=>{ applyFilter(); render(); };
 
 function buildQuizItems(count=5){
   const base = [...rows].sort(()=>Math.random()-0.5).slice(0, Math.min(count, rows.length));
@@ -94,6 +130,7 @@ document.getElementById('quizStartBtn').onclick = ()=>{
   const res = await fetch('./data/sentences.json');
   const json = await res.json();
   rows = json.sentences || [];
+  populateCategories();
   applyFilter();
   render();
 })();

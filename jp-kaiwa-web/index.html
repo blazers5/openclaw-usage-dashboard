@@ -14,6 +14,21 @@
   </header>
 
   <main class="container">
+    <section class="card controls-card">
+      <div class="controls-grid">
+        <label>
+          카테고리
+          <select id="categoryFilter">
+            <option value="all">전체</option>
+          </select>
+        </label>
+        <label>
+          검색 (일본어/한국어)
+          <input type="search" id="searchInput" placeholder="예: ありがとう / 고마워" />
+        </label>
+      </div>
+    </section>
+
     <section class="card" id="sentenceCard"></section>
     <div class="actions">
       <button id="prevBtn">이전</button>
