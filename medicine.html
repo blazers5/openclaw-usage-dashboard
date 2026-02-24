@@ -670,9 +670,8 @@ async function downloadPrintFile(){
 
   for(let start=1; start<=300; start+=60){
     const end = start + 59;
-    const leftSet = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= (start + 29));
-    const rightSet = sorted.filter(r => Number(r.no) >= (start + 30) && Number(r.no) <= end);
-    if(!leftSet.length && !rightSet.length) continue;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
 
     const ws = wb.addWorksheet(`${start}-${end}`, {
       pageSetup: {
@@ -683,41 +682,31 @@ async function downloadPrintFile(){
         scale: 100,
         fitToWidth: 1,
         fitToHeight: 1,
-        horizontalCentered: false
+        horizontalCentered: false,
+        printTitlesRow: '1:1'
       }
     });
 
-    // 한 페이지에 7.5cm 표 2개(좌/우) 배치 후 재단
+    // 1~60 한 페이지(세로형) 규격
     ws.columns = [
-      { width: 6 }, { width: 14 }, { width: 4 }, { width: 6 },
-      { width: 2 },
-      { width: 6 }, { width: 14 }, { width: 4 }, { width: 6 }
+      { width: 6 },   // 약품코드
+      { width: 14 },  // 약품명
+      { width: 4 },   // 번호
+      { width: 6 }    // 유효기간
     ];
 
-    const headers = ['약품코드','약품명','번호','유효기간'];
-    headers.forEach((h, i) => {
-      ws.getCell(1, i + 1).value = h;      // A-D
-      ws.getCell(1, i + 6).value = h;      // F-I
-    });
+    ws.getCell(1,1).value = '약품코드';
+    ws.getCell(1,2).value = '약품명';
+    ws.getCell(1,3).value = '번호';
+    ws.getCell(1,4).value = '유효기간';
 
-    for(let i=0; i<30; i++){
-      const l = leftSet[i];
-      const r = rightSet[i];
+    set.forEach((r, i) => {
       const row = i + 2;
-
-      if(l){
-        ws.getCell(row,1).value = l.code || '';
-        ws.getCell(row,2).value = l.name || '';
-        ws.getCell(row,3).value = Number(l.no) || '';
-        ws.getCell(row,4).value = l.expiry_date || '';
-      }
-      if(r){
-        ws.getCell(row,6).value = r.code || '';
-        ws.getCell(row,7).value = r.name || '';
-        ws.getCell(row,8).value = Number(r.no) || '';
-        ws.getCell(row,9).value = r.expiry_date || '';
-      }
-    }
+      ws.getCell(row,1).value = r.code || '';
+      ws.getCell(row,2).value = r.name || '';
+      ws.getCell(row,3).value = Number(r.no) || '';
+      ws.getCell(row,4).value = r.expiry_date || '';
+    });
 
     const styleCell = (cell, isHeader=false) => {
       cell.font = { name:'맑은 고딕', size:isHeader ? 9 : 8.5, bold:isHeader };
@@ -725,18 +714,15 @@ async function downloadPrintFile(){
       cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
     };
 
-    // 좌/우 표 스타일
-    for(let c=1; c<=4; c++) styleCell(ws.getCell(1,c), true);
-    for(let c=6; c<=9; c++) styleCell(ws.getCell(1,c), true);
-
     ws.getRow(1).height = 20;
-    for(let r=2; r<=31; r++){
+    for(let c=1; c<=4; c++) styleCell(ws.getCell(1,c), true);
+
+    for(let r=2; r<=set.length+1; r++){
       ws.getRow(r).height = 18;
       for(let c=1; c<=4; c++) styleCell(ws.getCell(r,c), false);
-      for(let c=6; c<=9; c++) styleCell(ws.getCell(r,c), false);
     }
 
-    ws.pageSetup.printArea = 'A1:I31';
+    ws.pageSetup.printArea = `A1:D${set.length+1}`;
   }
 
   const buf = await wb.xlsx.writeBuffer();
