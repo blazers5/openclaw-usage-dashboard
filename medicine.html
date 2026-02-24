@@ -616,9 +616,9 @@ function printRangeSheets(){
     if(!set.length) continue;
     const body = set.map(r => `
       <tr>
-        <td>${esc(r.no)}</td>
-        <td>${esc(r.name)}</td>
         <td>${esc(r.code)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.no)}</td>
         <td>${esc(r.expiry_date || '')}</td>
       </tr>`).join('');
 
@@ -626,7 +626,7 @@ function printRangeSheets(){
       <section class="sheet">
         <div class="range">${start}-${end}</div>
         <table>
-          <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th></tr></thead>
+          <thead><tr><th>약품코드</th><th>약품명</th><th>번호</th><th>유효기간</th></tr></thead>
           <tbody>${body}</tbody>
         </table>
       </section>
@@ -642,10 +642,10 @@ function printRangeSheets(){
     .range{font-size:11px;font-weight:700;margin:0 0 2mm 0}
     table{border-collapse:collapse;width:7.5cm;table-layout:fixed}
     th,td{border:1px solid #111;padding:2px 2px;font-size:10px;height:18px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    th:nth-child(1),td:nth-child(1){width:0.9cm}
-    th:nth-child(2),td:nth-child(2){width:3.4cm}
-    th:nth-child(3),td:nth-child(3){width:1.3cm}
-    th:nth-child(4),td:nth-child(4){width:1.9cm}
+    th:nth-child(1),td:nth-child(1){width:1.4cm}
+    th:nth-child(2),td:nth-child(2){width:3.6cm}
+    th:nth-child(3),td:nth-child(3){width:0.9cm}
+    th:nth-child(4),td:nth-child(4){width:1.6cm}
   </style></head><body>${sections.join('')}</body></html>`;
 
   const w = window.open('', '_blank');
@@ -689,12 +689,12 @@ async function downloadPrintFile(){
 
     // 한 페이지에 7.5cm 표 2개(좌/우) 배치 후 재단
     ws.columns = [
-      { width: 4 }, { width: 14 }, { width: 6 }, { width: 6 },
+      { width: 6 }, { width: 14 }, { width: 4 }, { width: 6 },
       { width: 2 },
-      { width: 4 }, { width: 14 }, { width: 6 }, { width: 6 }
+      { width: 6 }, { width: 14 }, { width: 4 }, { width: 6 }
     ];
 
-    const headers = ['번호','약품명','약품코드','유효기간'];
+    const headers = ['약품코드','약품명','번호','유효기간'];
     headers.forEach((h, i) => {
       ws.getCell(1, i + 1).value = h;      // A-D
       ws.getCell(1, i + 6).value = h;      // F-I
@@ -706,15 +706,15 @@ async function downloadPrintFile(){
       const row = i + 2;
 
       if(l){
-        ws.getCell(row,1).value = Number(l.no) || '';
+        ws.getCell(row,1).value = l.code || '';
         ws.getCell(row,2).value = l.name || '';
-        ws.getCell(row,3).value = l.code || '';
+        ws.getCell(row,3).value = Number(l.no) || '';
         ws.getCell(row,4).value = l.expiry_date || '';
       }
       if(r){
-        ws.getCell(row,6).value = Number(r.no) || '';
+        ws.getCell(row,6).value = r.code || '';
         ws.getCell(row,7).value = r.name || '';
-        ws.getCell(row,8).value = r.code || '';
+        ws.getCell(row,8).value = Number(r.no) || '';
         ws.getCell(row,9).value = r.expiry_date || '';
       }
     }
