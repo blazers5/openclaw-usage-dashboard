@@ -102,6 +102,7 @@
   <div class="sticky-tools">
     <div class="top">
       <input id="q" placeholder="약품명/번호/코드 검색" style="flex:1;min-width:240px" />
+      <button id="printRange">출력(1-60 분할)</button>
       <button id="adminLogin">관리자 로그인</button>
       <button id="adminLogout" style="display:none">로그아웃</button>
       <button id="adminAddRow" style="display:none">행 추가</button>
@@ -174,6 +175,7 @@ const loginBtn = document.getElementById('adminLogin');
 const logoutBtn = document.getElementById('adminLogout');
 const adminAddRowBtn = document.getElementById('adminAddRow');
 const adminClearAllBtn = document.getElementById('adminClearAll');
+const printRangeBtn = document.getElementById('printRange');
 const pwModal = document.getElementById('pwModal');
 const pwInput = document.getElementById('pwInput');
 const NAVER_PROXY_ENDPOINTS = [
@@ -494,10 +496,63 @@ async function saveRow(e){
   render();
 }
 
+function printRangeSheets(){
+  const sorted = [...rows].sort((a,b)=>(Number(a.no)||0)-(Number(b.no)||0));
+  if(!sorted.length){ alert('출력할 데이터가 없습니다.'); return; }
+
+  const sections = [];
+  for(let start=1; start<=300; start+=60){
+    const end = start + 59;
+    const set = sorted.filter(r => Number(r.no) >= start && Number(r.no) <= end);
+    if(!set.length) continue;
+    const body = set.map(r => `
+      <tr>
+        <td>${esc(r.no)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.code)}</td>
+        <td>${esc(r.expiry_date || '')}</td>
+      </tr>`).join('');
+
+    sections.push(`
+      <section class="sheet">
+        <div class="range">${start}-${end}</div>
+        <table>
+          <thead><tr><th>번호</th><th>약품명</th><th>약품코드</th><th>유효기간</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </section>
+    `);
+  }
+
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>약품 출력</title>
+  <style>
+    @page { size: A4 portrait; margin: 6mm; }
+    body{font-family:'Malgun Gothic',sans-serif;margin:0}
+    .sheet{page-break-after:always}
+    .sheet:last-child{page-break-after:auto}
+    .range{font-size:11px;font-weight:700;margin:0 0 2mm 0}
+    table{border-collapse:collapse;width:7.5cm;table-layout:fixed}
+    th,td{border:1px solid #111;padding:2px 2px;font-size:10px;height:18px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    th:nth-child(1),td:nth-child(1){width:0.9cm}
+    th:nth-child(2),td:nth-child(2){width:3.4cm}
+    th:nth-child(3),td:nth-child(3){width:1.3cm}
+    th:nth-child(4),td:nth-child(4){width:1.9cm}
+  </style></head><body>${sections.join('')}</body></html>`;
+
+  const w = window.open('', '_blank');
+  if(!w){ alert('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 200);
+}
+
 function openPwModal(){ pwModal.style.display='flex'; pwInput.value=''; setTimeout(()=>pwInput.focus(), 10); }
 function closePwModal(){ pwModal.style.display='none'; }
 
 q.addEventListener('input', render);
+printRangeBtn.addEventListener('click', printRangeSheets);
 loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
