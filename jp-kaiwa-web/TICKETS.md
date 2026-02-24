@@ -1,7 +1,7 @@
 # 개발 티켓 보드 (MVP)
 
 ## Must
-- [ ] T-001 데이터 스키마 확정 (`data/sentences.json`)
+- [x] T-001 데이터 스키마 확정 (`data/sentences.json`)
   - AC: id/category/jp/ko/pron 필드 검증
 - [ ] T-002 문장 카드 UI
   - AC: 원문/뜻/발음 토글 노출
@@ -19,13 +19,17 @@
   - AC: 390px 모바일 화면 사용 가능
 
 ## Should
-- [ ] T-009 카테고리 탭
-- [ ] T-010 검색(일본어/한국어)
+- [x] T-009 카테고리 탭
+- [x] T-010 검색(일본어/한국어)
 - [ ] T-011 설정(발음 표시 기본값, 재생속도)
 
 ## Could
 - [ ] T-012 학습 통계 위젯
 - [ ] T-013 온보딩 3스텝
+
+## Ops/QA
+- [x] T-014 기본 QA 체크리스트 문서화 (`QA_CHECKLIST.md`)
+- [x] T-015 README 정비 (실행/구조/기능/데이터)
 
 ## 공통 Definition of Done
 - 동작 확인(Chrome/Edge)
