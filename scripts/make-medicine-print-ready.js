@@ -33,25 +33,57 @@ const path = require('path');
   });
 
   ws.columns = [
-    { header: '약품코드', key: 'code', width: 12 },
-    { header: '약품명', key: 'name', width: 30 },
-    { header: '번호', key: 'no', width: 8 },
-    { header: '유효기간', key: 'exp', width: 12 }
+    { header: '약품코드', key: 'code', width: 11 },
+    { header: '약품명', key: 'name', width: 28 },
+    { header: '번호', key: 'no', width: 7 },
+    { header: '유효기간', key: 'exp', width: 11 }
   ];
 
-  for (const row of rows) {
-    const code = String(row['약품코드'] ?? '').trim();
-    const name = String(row['약품명'] ?? '').trim();
-    const no = String(row['번호'] ?? '').trim();
-    const exp = String(row['유효기간'] ?? '').trim();
-    if (!code && !name && !no) continue;
-    ws.addRow({ code, name, no, exp });
+  // 번호 기준 정렬 후 30행 단위로 헤더 반복(사진 출력 포맷 유사)
+  const dataRows = rows
+    .map((row) => ({
+      code: String(row['약품코드'] ?? '').trim(),
+      name: String(row['약품명'] ?? '').trim(),
+      no: String(row['번호'] ?? '').trim(),
+      exp: String(row['유효기간'] ?? '').trim()
+    }))
+    .filter((r) => r.code || r.name || r.no)
+    .sort((a, b) => Number(a.no || 0) - Number(b.no || 0));
+
+  const chunkSize = 30;
+  let outRow = 1;
+
+  function writeHeader(rowNo) {
+    ws.getCell(`A${rowNo}`).value = '약품코드';
+    ws.getCell(`B${rowNo}`).value = '약품명';
+    ws.getCell(`C${rowNo}`).value = '번호';
+    ws.getCell(`D${rowNo}`).value = '유효기간';
   }
 
+  writeHeader(outRow);
+
+  for (let i = 0; i < dataRows.length; i++) {
+    if (i > 0 && i % chunkSize === 0) {
+      ws.getRow(outRow).addPageBreak();
+      outRow += 1;
+      writeHeader(outRow);
+    }
+    outRow += 1;
+    const r = dataRows[i];
+    ws.getCell(`A${outRow}`).value = r.code;
+    ws.getCell(`B${outRow}`).value = r.name;
+    ws.getCell(`C${outRow}`).value = r.no;
+    ws.getCell(`D${outRow}`).value = r.exp;
+  }
+
+  const lastRow = outRow;
+
   ws.eachRow((row, rowNumber) => {
-    row.height = rowNumber === 1 ? 28 : 24;
+    const isHeader = ['약품코드', '약품명', '번호', '유효기간'].includes(String(row.getCell(1).value || ''))
+      && String(row.getCell(2).value || '') === '약품명';
+    row.height = isHeader ? 24 : 22;
     row.eachCell((cell) => {
-      cell.font = { name: '맑은 고딕', size: 11, bold: rowNumber === 1 };
+      cell.font = { name: '맑은 고딕', size: isHeader ? 11 : 10.5, bold: isHeader };
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: false };
       cell.border = {
         top: { style: 'thin' },
@@ -62,7 +94,7 @@ const path = require('path');
     });
   });
 
-  ws.views = [{ state: 'frozen', ySplit: 1 }];
+  ws.pageSetup.printArea = `A1:D${lastRow}`;
 
   await outWb.xlsx.writeFile(out);
   console.log(out);
