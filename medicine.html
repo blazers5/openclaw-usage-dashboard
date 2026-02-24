@@ -23,7 +23,7 @@
       --radius:14px;
     }
     *{box-sizing:border-box}
-    body{font-family:'Noto Sans KR','맑은 고딕','Segoe UI',Roboto,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f3f4f6 0%,#e5e7eb 100%);color:var(--text);padding:16px;line-height:1.5}
+    body{font-family:'맑은 고딕','Malgun Gothic','Segoe UI',Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f3f4f6 0%,#e5e7eb 100%);color:var(--text);padding:16px;line-height:1.5;text-rendering:optimizeLegibility}
     .wrap{max-width:1200px;margin:0 auto}
     h2{margin:0;font-size:28px;letter-spacing:-0.2px;color:var(--accent-strong)}
     .title-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
@@ -47,8 +47,8 @@
     table{width:100%;min-width:860px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;table-layout:fixed}
     th,td{padding:11px 12px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
     th{background:var(--panel-2);color:var(--accent);font-weight:700}
-    th:nth-child(1), td:nth-child(1){width:170px;text-align:center;font-weight:700}
-    th:nth-child(2), td:nth-child(2){width:340px;white-space:normal;word-break:keep-all;font-weight:700}
+    th:nth-child(1), td:nth-child(1){width:170px;text-align:center;font-weight:600;letter-spacing:-0.1px}
+    th:nth-child(2), td:nth-child(2){width:340px;white-space:normal;word-break:keep-all;font-weight:600;letter-spacing:-0.1px}
     th:nth-child(3), td:nth-child(3){width:170px;text-align:center;white-space:nowrap}
     th:nth-child(4), td:nth-child(4){width:120px;text-align:center}
     .muted{color:#475569;font-size:12px}
@@ -90,9 +90,9 @@
       td{display:table-cell;padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:9px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       /* 모바일: 번호/약품명 간격 균형 + 유효기간 정렬 개선 */
-      th:nth-child(1), td:nth-child(1){width:92px;padding-right:4px;font-weight:700}
-      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:6px; font-size:14.5px;font-weight:700}
-      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap;font-weight:600}
+      th:nth-child(1), td:nth-child(1){width:92px;padding-right:4px;font-weight:600;letter-spacing:-0.1px}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:6px; font-size:14px;font-weight:600;letter-spacing:-0.1px}
+      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap;font-weight:500}
       th:nth-child(4), td:nth-child(4){width:52px}
       td[data-label]::before{content:none}
       .cell-input{min-width:0;padding:7px 6px;font-size:12px}
