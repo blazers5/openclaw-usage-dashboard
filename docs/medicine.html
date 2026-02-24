@@ -713,11 +713,11 @@ async function downloadPrintFile(){
       cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
     };
 
-    ws.getRow(1).height = 10.5;
+    ws.getRow(1).height = 11.2;
     for(let c=1; c<=4; c++) styleCell(ws.getCell(1,c), true);
 
     for(let r=2; r<=set.length+1; r++){
-      ws.getRow(r).height = 9.6;
+      ws.getRow(r).height = 10.1;
       for(let c=1; c<=4; c++) styleCell(ws.getCell(r,c), false);
     }
 
