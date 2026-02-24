@@ -708,16 +708,16 @@ async function downloadPrintFile(){
     });
 
     const styleCell = (cell, isHeader=false) => {
-      cell.font = { name:'맑은 고딕', size:isHeader ? 7.2 : 6.9, bold:isHeader };
+      cell.font = { name:'맑은 고딕', size:isHeader ? 7.6 : 7.2, bold:isHeader };
       cell.alignment = { vertical:'middle', horizontal:'center' };
       cell.border = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
     };
 
-    ws.getRow(1).height = 9;
+    ws.getRow(1).height = 10.5;
     for(let c=1; c<=4; c++) styleCell(ws.getCell(1,c), true);
 
     for(let r=2; r<=set.length+1; r++){
-      ws.getRow(r).height = 8.5;
+      ws.getRow(r).height = 9.6;
       for(let c=1; c<=4; c++) styleCell(ws.getCell(r,c), false);
     }
 
