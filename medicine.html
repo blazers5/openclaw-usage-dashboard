@@ -743,7 +743,7 @@ loginBtn.addEventListener('click', openPwModal);
 logoutBtn.addEventListener('click', ()=>{ isAdmin=false; sessionStorage.removeItem(ADMIN_SESSION_KEY); setMode(); render(); });
 document.getElementById('reload').addEventListener('click', loadData);
 if(printRangeBtn) printRangeBtn.addEventListener('click', printRangeSheets);
-if(printQuickBtn) printQuickBtn.addEventListener('click', downloadPrintFile);
+if(printQuickBtn) printQuickBtn.addEventListener('click', printRangeSheets);
 if(filePrintFab) filePrintFab.addEventListener('click', downloadPrintFile);
 adminAddRowBtn.addEventListener('click', addRow);
 adminClearAllBtn.addEventListener('click', clearAllRows);
