@@ -37,9 +37,9 @@ const path = require('path');
 
     // 7.5cm 폭 근사
     ws.columns = [
-      { header: '약품코드', key: 'code', width: 6 },
-      { header: '약품명', key: 'name', width: 14 },
       { header: '번호', key: 'no', width: 4 },
+      { header: '약품명', key: 'name', width: 14 },
+      { header: '약품코드', key: 'code', width: 6 },
       { header: '유효기간', key: 'exp', width: 6 }
     ];
 
