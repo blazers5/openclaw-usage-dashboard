@@ -47,10 +47,11 @@
     table{width:100%;min-width:860px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;table-layout:fixed}
     th,td{padding:11px 12px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px;vertical-align:middle;line-height:1.45}
     th{background:var(--panel-2);color:var(--accent);font-weight:700}
-    th:nth-child(1), td:nth-child(1){width:170px;text-align:center;font-weight:600;letter-spacing:-0.1px}
-    th:nth-child(2), td:nth-child(2){width:340px;white-space:normal;word-break:keep-all;font-weight:600;letter-spacing:-0.1px}
+    th:nth-child(1), td:nth-child(1){width:110px;text-align:center;font-weight:600;letter-spacing:-0.1px}
+    th:nth-child(2), td:nth-child(2){width:300px;white-space:normal;word-break:keep-all;font-weight:600;letter-spacing:-0.1px}
     th:nth-child(3), td:nth-child(3){width:170px;text-align:center;white-space:nowrap}
-    th:nth-child(4), td:nth-child(4){width:120px;text-align:center}
+    th:nth-child(4), td:nth-child(4){width:150px;text-align:center;white-space:nowrap}
+    th:nth-child(5), td:nth-child(5){width:120px;text-align:center}
     .muted{color:#475569;font-size:12px}
     .pill{padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff}
     .row{margin-top:10px}
@@ -89,15 +90,17 @@
       tr{display:table-row}
       td{display:table-cell;padding:9px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       th{font-size:12px;padding:9px 8px;background:#f4f7ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      /* 모바일: 번호/약품명 간격 균형 + 유효기간 정렬 개선 */
-      th:nth-child(1), td:nth-child(1){width:92px;padding-right:4px;font-weight:600;letter-spacing:-0.1px}
-      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.5; padding-left:6px; font-size:14px;font-weight:600;letter-spacing:-0.1px}
-      th:nth-child(3), td:nth-child(3){width:120px; text-align:center; white-space:nowrap;font-weight:500}
-      th:nth-child(4), td:nth-child(4){width:52px}
+      /* 모바일: 번호/약품명/코드 분리 표시 */
+      th:nth-child(1), td:nth-child(1){width:76px;padding-right:4px;font-weight:600;letter-spacing:-0.1px}
+      th:nth-child(2), td:nth-child(2){width:auto; white-space:normal; word-break:keep-all; overflow:visible; text-overflow:clip; line-height:1.45; padding-left:6px; font-size:13.5px;font-weight:600;letter-spacing:-0.1px}
+      th:nth-child(3), td:nth-child(3){width:92px; text-align:center; white-space:nowrap;font-weight:500}
+      th:nth-child(4), td:nth-child(4){width:110px; text-align:center; white-space:nowrap}
+      th:nth-child(5), td:nth-child(5){width:52px}
       td[data-label]::before{content:none}
       .cell-input{min-width:0;padding:7px 6px;font-size:12px}
       td:nth-child(1) .cell-input{width:100%;padding:7px 4px;text-align:center}
-      td:nth-child(3) .cell-input{width:100%;padding:7px 2px;font-size:11px;text-align:center}
+      td:nth-child(3) .cell-input{width:100%;padding:7px 4px;font-size:11px;text-align:center}
+      td:nth-child(4) .cell-input{width:100%;padding:7px 2px;font-size:11px;text-align:center}
       .save-wrap{display:flex;flex-direction:column;justify-content:flex-start;gap:3px;align-items:stretch}
       .save-btn{width:100%;min-width:0;padding:4px 3px;font-size:10px;line-height:1.1}
       .footer{font-size:11px}
@@ -167,7 +170,8 @@
       <thead>
         <tr>
           <th style="width:64px">번호</th>
-          <th>약품명(코드)</th>
+          <th>약품명</th>
+          <th style="width:120px">약품코드</th>
           <th style="width:120px">유효기간</th>
           <th style="width:72px">저장</th>
         </tr>
@@ -281,7 +285,8 @@ function rowView(r){
     return `
       <tr data-id="${r.id}">
         <td data-label="번호">${r.no}</td>
-        <td data-label="약품명"><b>${esc(r.name)}</b> <span class="muted">(${esc(r.code)})</span></td>
+        <td data-label="약품명"><b>${esc(r.name)}</b></td>
+        <td data-label="약품코드"><span class="muted">${esc(r.code)}</span></td>
         <td data-label="유효기간">${r.expiry_date || '-'}</td>
         <td data-label="저장" class="muted">-</td>
       </tr>`;
@@ -290,11 +295,8 @@ function rowView(r){
   return `
     <tr data-id="${r.id}">
       <td data-label="번호"><input class="cell-input" inputmode="numeric" data-field="no" value="${esc(r.no)}" /></td>
-      <td data-label="약품명">
-        <span>${esc(r.name)}</span>
-        <input class="cell-input" data-field="name" value="${esc(r.name)}" style="margin-top:4px" />
-        <input class="cell-input" data-field="code" value="${esc(r.code)}" style="margin-top:4px" />
-      </td>
+      <td data-label="약품명"><input class="cell-input" data-field="name" value="${esc(r.name)}" /></td>
+      <td data-label="약품코드"><input class="cell-input" data-field="code" value="${esc(r.code)}" /></td>
       <td data-label="유효기간"><input class="cell-input" type="text" inputmode="numeric" placeholder="yymmdd" data-field="expiry_date" value="${esc((r.expiry_date || '').replace(/-/g,''))}" /></td>
       <td data-label="저장">
         <div class="save-wrap">
