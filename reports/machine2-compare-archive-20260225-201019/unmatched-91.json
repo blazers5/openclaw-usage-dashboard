@@ -1,0 +1,548 @@
+[
+  {
+    "srcNo": 6,
+    "srcCode": "amd2.5",
+    "srcName": "레보텐션정2.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 15,
+    "srcCode": "acl",
+    "srcName": "아세로정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 17,
+    "srcCode": "avlx2",
+    "srcName": "퀴녹스정400mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 22,
+    "srcCode": "at1",
+    "srcName": "엑스페인정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 23,
+    "srcCode": "cdr",
+    "srcName": "카두라엑스엘서방정4mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 24,
+    "srcCode": "lx",
+    "srcName": "라식스정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 25,
+    "srcCode": "anthy",
+    "srcName": "안티로이드정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 28,
+    "srcCode": "glia3",
+    "srcName": "알포아티린연질캡슐",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 32,
+    "srcCode": "bera",
+    "srcName": "베라실정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 33,
+    "srcCode": "tst",
+    "srcName": "트레스탄캡슐",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 36,
+    "srcCode": "abx2",
+    "srcName": "뮤코펙트정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 39,
+    "srcCode": "amx5",
+    "srcName": "일동아목시실린수화물캡슐500mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 47,
+    "srcCode": "lst",
+    "srcName": "코자정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 49,
+    "srcCode": "dnpz5",
+    "srcName": "아리페질정5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 50,
+    "srcCode": "levo4",
+    "srcName": "일양바이오레보설피리드정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 56,
+    "srcCode": "cys3",
+    "srcName": "뮤테란캡슐200mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 59,
+    "srcCode": "prom1",
+    "srcName": "프로이머정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 60,
+    "srcCode": "rqp0.25",
+    "srcName": "리큅정0.25mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 61,
+    "srcCode": "venx75",
+    "srcName": "베넥사엑스알서방캡슐75mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 68,
+    "srcCode": "war5m",
+    "srcName": "와르파린나트륨5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 72,
+    "srcCode": "star1",
+    "srcName": "넵틴정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 77,
+    "srcCode": "crez",
+    "srcName": "로수바미브정10/10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 79,
+    "srcCode": "cvd25",
+    "srcName": "딜라트렌정25mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 82,
+    "srcCode": "bhx1",
+    "srcName": "뮤코졸정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 83,
+    "srcCode": "lipi10",
+    "srcName": "아토르바정10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 87,
+    "srcCode": "kepra2",
+    "srcName": "케프렙톨정500mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 89,
+    "srcCode": "ibstp",
+    "srcName": "코아프로벨정150/12.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 93,
+    "srcCode": "teve",
+    "srcName": "테베텐정600mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 94,
+    "srcCode": "oxcb3",
+    "srcName": "트리렙탈필름코팅정300mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 102,
+    "srcCode": "rispm0.5",
+    "srcName": "리스펜정0.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 108,
+    "srcCode": "cres1",
+    "srcName": "로베틴정10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 111,
+    "srcCode": "tfd-sr",
+    "srcName": "디트루시톨SR캡슐2mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 115,
+    "srcCode": "tfd4",
+    "srcName": "디트루시톨SR캡슐4mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 118,
+    "srcCode": "mpd",
+    "srcName": "메치론정4mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 119,
+    "srcCode": "domp3",
+    "srcName": "모티리움엠정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 123,
+    "srcCode": "lofx1",
+    "srcName": "레보미신정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 127,
+    "srcCode": "bam",
+    "srcName": "아스테롤정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 133,
+    "srcCode": "aten1",
+    "srcName": "대웅아테놀롤정50mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 134,
+    "srcCode": "grd",
+    "srcName": "환인그란닥신정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 141,
+    "srcCode": "xarel1",
+    "srcName": "자렐토정15mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 145,
+    "srcCode": "clpd2",
+    "srcName": "클로그렐정75mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 147,
+    "srcCode": "xarel2",
+    "srcName": "자렐토정20mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 149,
+    "srcCode": "cbzcr",
+    "srcName": "에필렙톨씨알정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 150,
+    "srcCode": "mdp",
+    "srcName": "마도파정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 152,
+    "srcCode": "mydi",
+    "srcName": "미카펜캡슐",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 154,
+    "srcCode": "glmm2",
+    "srcName": "글리팜엠정2/500mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 155,
+    "srcCode": "mnf",
+    "srcName": "모니플루정350mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 156,
+    "srcCode": "lipi20",
+    "srcName": "아토르바정20mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 158,
+    "srcCode": "cof",
+    "srcName": "코프렐정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 164,
+    "srcCode": "gaba1jc",
+    "srcName": "가바렙100mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 167,
+    "srcCode": "apixa2.5",
+    "srcName": "리퀴시아정2.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 169,
+    "srcCode": "levop",
+    "srcName": "레보필정 (종근당)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 171,
+    "srcCode": "atj",
+    "srcName": "래피셋정 325mg (종근당)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 172,
+    "srcCode": "glia2",
+    "srcName": "글리아티린연질캡",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 173,
+    "srcCode": "cres2",
+    "srcName": "로수로드정10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 174,
+    "srcCode": "apixa5",
+    "srcName": "리퀴시아5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 175,
+    "srcCode": "dimen3",
+    "srcName": "메만틴정10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 178,
+    "srcCode": "ata",
+    "srcName": "아타칸정8mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 181,
+    "srcCode": "foxig",
+    "srcName": "포시가정10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 183,
+    "srcCode": "amd",
+    "srcName": "아모디핀정5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 184,
+    "srcCode": "surf2",
+    "srcName": "설포라제캡",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 187,
+    "srcCode": "preg7.5",
+    "srcName": "카발린캡슐75mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 188,
+    "srcCode": "mgt",
+    "srcName": "마그밀정500mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 192,
+    "srcCode": "clz5",
+    "srcName": "실타졸50mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 195,
+    "srcCode": "cele1",
+    "srcName": "쎄레브이캡슐",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 198,
+    "srcCode": "gaba3d",
+    "srcName": "가바렙틴300",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 206,
+    "srcCode": "nebi",
+    "srcName": "네비스톨정2.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 207,
+    "srcCode": "cfrx2",
+    "srcName": "프록세틸정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 208,
+    "srcCode": "bann1",
+    "srcName": "세포독심정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 211,
+    "srcCode": "preg15",
+    "srcName": "(119) 카발린 캡슐 150mg (HK inno.N)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 215,
+    "srcCode": "crv",
+    "srcName": "크라비트",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 218,
+    "srcCode": "crez1",
+    "srcName": "로바젯10/10mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 220,
+    "srcCode": "cipro",
+    "srcName": "싸이신정250mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 221,
+    "srcCode": "crez2",
+    "srcName": "로수젯정10/10mg (한미)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 223,
+    "srcCode": "ata16",
+    "srcName": "아타칸정16mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 224,
+    "srcCode": "menia16",
+    "srcName": "유턴정16mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 233,
+    "srcCode": "clz10",
+    "srcName": "실로스타졸서방캡슐100mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 246,
+    "srcCode": "duxe6",
+    "srcName": "심발타캡슐60mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 250,
+    "srcCode": "quet1",
+    "srcName": "큐티핀정25mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 251,
+    "srcCode": "pat0.5",
+    "srcName": "파라마셋세미정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 258,
+    "srcCode": "bis1",
+    "srcName": "콩브럭 정 2.5mg (에리슨)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 259,
+    "srcCode": "ppl2",
+    "srcName": "테프라정40mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 261,
+    "srcCode": "aapt",
+    "srcName": "타세놀이알서방정",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 270,
+    "srcCode": "duxe30",
+    "srcName": "드록틴캡슐30mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 275,
+    "srcCode": "zypr1",
+    "srcName": "자이레핀정2.5mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 277,
+    "srcCode": "mado1",
+    "srcName": "명도파정25/100mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 278,
+    "srcCode": "alle",
+    "srcName": "알레그라정120mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 281,
+    "srcCode": "famcv",
+    "srcName": "대웅팜시클로비르정250mg",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 285,
+    "srcCode": "galv1",
+    "srcName": "(396) 빌가드 정 50mg (삼진)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 286,
+    "srcCode": "duxe60",
+    "srcName": "듀록타 캡슐 60mg(이노엔)",
+    "status": "UNMATCHED"
+  },
+  {
+    "srcNo": 287,
+    "srcCode": "spr",
+    "srcName": "스피로닥톤정25mg(구주제약)",
+    "status": "UNMATCHED"
+  }
+]
