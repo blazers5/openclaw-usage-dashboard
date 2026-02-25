@@ -1,0 +1,1073 @@
+[
+  {
+    "srcNo": 1,
+    "srcCode": "macp",
+    "srcName": "멕페란정",
+    "tgtNo": 41,
+    "tgtCode": "macp",
+    "tgtName": "멕페란정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 2,
+    "srcCode": "thebr",
+    "srcName": "애니코프캡슐300mg",
+    "tgtNo": 253,
+    "tgtCode": "thebr",
+    "tgtName": "애니코프캡슐300mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 3,
+    "srcCode": "lyri0.5",
+    "srcName": "리리카캡슐75mg",
+    "tgtNo": 151,
+    "tgtCode": "lyri0.5",
+    "tgtName": "리리카캡슐75mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 4,
+    "srcCode": "fero-u",
+    "srcName": "훼로바-유서방정",
+    "tgtNo": 195,
+    "tgtCode": "fero-u",
+    "tgtName": "훼로바-유 서방정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 7,
+    "srcCode": "surf3",
+    "srcName": "뮤코테인캡슐",
+    "tgtNo": 74,
+    "tgtCode": "surf3",
+    "tgtName": "뮤코테인캡슐",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 13,
+    "srcCode": "ibst3",
+    "srcName": "아프로벨정300mg",
+    "tgtNo": 140,
+    "tgtCode": "ibst3",
+    "tgtName": "아프로벨정300mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 14,
+    "srcCode": "nor",
+    "srcName": "노바스크",
+    "tgtNo": 89,
+    "tgtCode": "nor",
+    "tgtName": "노바스크",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 19,
+    "srcCode": "galv",
+    "srcName": "가브스정50mg",
+    "tgtNo": 255,
+    "tgtCode": "galv",
+    "tgtName": "가브스정 50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 20,
+    "srcCode": "ata1",
+    "srcName": "칸데모어정8mg",
+    "tgtNo": 156,
+    "tgtCode": "ata1",
+    "tgtName": "칸데모어정8mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 30,
+    "srcCode": "adt",
+    "srcName": "알닥톤필름코팅정25mg",
+    "tgtNo": 214,
+    "tgtCode": "adt",
+    "tgtName": "알닥톤필름코팅정25mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 34,
+    "srcCode": "bease",
+    "srcName": "베아제정",
+    "tgtNo": 69,
+    "tgtCode": "bease",
+    "tgtName": "베아제정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 35,
+    "srcCode": "moti",
+    "srcName": "모티리톤정",
+    "tgtNo": 34,
+    "tgtCode": "moti",
+    "tgtName": "모티리톤정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 38,
+    "srcCode": "pd",
+    "srcName": "소론도정",
+    "tgtNo": 256,
+    "tgtCode": "pd",
+    "tgtName": "소론도정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 41,
+    "srcCode": "gph",
+    "srcName": "다이아벡스정500mg",
+    "tgtNo": 153,
+    "tgtCode": "gph",
+    "tgtName": "다이아벡스정500mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 42,
+    "srcCode": "polib15",
+    "srcName": "포리부틴정150mg",
+    "tgtNo": 170,
+    "tgtCode": "polib15",
+    "tgtName": "포리부틴정150mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 43,
+    "srcCode": "cvd6.25",
+    "srcName": "바소트롤6.25mg",
+    "tgtNo": 35,
+    "tgtCode": "cvd6.25",
+    "tgtName": "바소트롤6.25mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 46,
+    "srcCode": "cfrx3",
+    "srcName": "세푸록심악세틸",
+    "tgtNo": 38,
+    "tgtCode": "cfrx3",
+    "tgtName": "세푸록심악세틸",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 48,
+    "srcCode": "sapg1",
+    "srcName": "안플라그정100mg",
+    "tgtNo": 70,
+    "tgtCode": "sapg1",
+    "tgtName": "안플라그정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 54,
+    "srcCode": "har-d1",
+    "srcName": "탐스오디정",
+    "tgtNo": 209,
+    "tgtCode": "har-d1",
+    "tgtName": "탐스오디정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 73,
+    "srcCode": "sing1",
+    "srcName": "루키오정10mg",
+    "tgtNo": 88,
+    "tgtCode": "sing1",
+    "tgtName": "루키오정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 75,
+    "srcCode": "lyri5",
+    "srcName": "리리카50mg",
+    "tgtNo": 133,
+    "tgtCode": "lyri5",
+    "tgtName": "리리카50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 81,
+    "srcCode": "msx1",
+    "srcName": "메섹신캅셀500mg",
+    "tgtNo": 19,
+    "tgtCode": "msx1",
+    "tgtName": "메섹신캅셀500mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 84,
+    "srcCode": "menias",
+    "srcName": "메네스에스정",
+    "tgtNo": 178,
+    "tgtCode": "menias",
+    "tgtName": "메네스에스정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 88,
+    "srcCode": "gkb",
+    "srcName": "기넥신에프정",
+    "tgtNo": 3,
+    "tgtCode": "gkb",
+    "tgtName": "기넥신에프정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 90,
+    "srcCode": "plt10",
+    "srcName": "프레탈정100mg",
+    "tgtNo": 287,
+    "tgtCode": "plt10",
+    "tgtName": "프레탈 정 100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 92,
+    "srcCode": "eliqs",
+    "srcName": "엘리퀴스정2.5mg",
+    "tgtNo": 29,
+    "tgtCode": "eliqs",
+    "tgtName": "엘리퀴스정2.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 96,
+    "srcCode": "war2m",
+    "srcName": "대화와르파린나트륨정2mg",
+    "tgtNo": 234,
+    "tgtCode": "war2m",
+    "tgtName": "대화 와르파린나트륨정2mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 104,
+    "srcCode": "quet",
+    "srcName": "쿠에타핀정25mg",
+    "tgtNo": 5,
+    "tgtCode": "quet",
+    "tgtName": "쿠에타핀 정25mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 105,
+    "srcCode": "glmd4",
+    "srcName": "글리멜정4mg",
+    "tgtNo": 183,
+    "tgtCode": "glmd4",
+    "tgtName": "글리멜정4mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 106,
+    "srcCode": "glmp",
+    "srcName": "글리멜정2mg",
+    "tgtNo": 21,
+    "tgtCode": "glmp",
+    "tgtName": "글리멜정2mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 107,
+    "srcCode": "eliqs5",
+    "srcName": "엘리퀴스정5mg",
+    "tgtNo": 193,
+    "tgtCode": "eliqs5",
+    "tgtName": "엘리퀴스정5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 109,
+    "srcCode": "pr",
+    "srcName": "페니라민정",
+    "tgtNo": 113,
+    "tgtCode": "pr",
+    "tgtName": "페니라민정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 113,
+    "srcCode": "dgx",
+    "srcName": "디고신정",
+    "tgtNo": 281,
+    "tgtCode": "dgx",
+    "tgtName": "디고신정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 116,
+    "srcCode": "at0.5",
+    "srcName": "엔시트라세미정",
+    "tgtNo": 111,
+    "tgtCode": "at0.5",
+    "tgtName": "엔시트라세미정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 117,
+    "srcCode": "zyr",
+    "srcName": "자이로릭정",
+    "tgtNo": 160,
+    "tgtCode": "zyr",
+    "tgtName": "자이로릭정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 121,
+    "srcCode": "acv40",
+    "srcName": "에크로바정400mg",
+    "tgtNo": 245,
+    "tgtCode": "acv40",
+    "tgtName": "에크로바정400mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 124,
+    "srcCode": "plt",
+    "srcName": "프레탈정50mg",
+    "tgtNo": 53,
+    "tgtCode": "plt",
+    "tgtName": "프레탈정 50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 128,
+    "srcCode": "ppl",
+    "srcName": "인데놀정40mg",
+    "tgtNo": 112,
+    "tgtCode": "ppl",
+    "tgtName": "인데놀정40mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 129,
+    "srcCode": "hoz",
+    "srcName": "아디팜정",
+    "tgtNo": 17,
+    "tgtCode": "hoz",
+    "tgtName": "아디팜정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 131,
+    "srcCode": "veni",
+    "srcName": "베니톨정",
+    "tgtNo": 62,
+    "tgtCode": "veni",
+    "tgtName": "베니톨정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 135,
+    "srcCode": "cco",
+    "srcName": "콜킨정",
+    "tgtNo": 59,
+    "tgtCode": "cco",
+    "tgtName": "콜킨정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 138,
+    "srcCode": "nrmx",
+    "srcName": "노르믹스정",
+    "tgtNo": 213,
+    "tgtCode": "nrmx",
+    "tgtName": "노르믹스정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 153,
+    "srcCode": "vb6",
+    "srcName": "신일피리독신정",
+    "tgtNo": 83,
+    "tgtCode": "vb6",
+    "tgtName": "신일피리독신정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 157,
+    "srcCode": "gb",
+    "srcName": "글루코바이정50mg",
+    "tgtNo": 248,
+    "tgtCode": "gb",
+    "tgtName": "글루코바이정50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 159,
+    "srcCode": "tmd15",
+    "srcName": "지트람엑스엘서방정150mg",
+    "tgtNo": 152,
+    "tgtCode": "tmd15",
+    "tgtName": "지트람엑스엘서방정150mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 160,
+    "srcCode": "ts1",
+    "srcName": "셉트린정",
+    "tgtNo": 219,
+    "tgtCode": "ts1",
+    "tgtName": "셉트린정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 168,
+    "srcCode": "clpd3",
+    "srcName": "플라비톨정 (동아)",
+    "tgtNo": 154,
+    "tgtCode": "clpd3",
+    "tgtName": "플라비톨정 (동아)",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 177,
+    "srcCode": "eupa",
+    "srcName": "스티렌",
+    "tgtNo": 57,
+    "tgtCode": "eupa",
+    "tgtName": "스티렌",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 179,
+    "srcCode": "atn50",
+    "srcName": "테놀민정50mg",
+    "tgtNo": 16,
+    "tgtCode": "atn50",
+    "tgtName": "테놀민정50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 185,
+    "srcCode": "cres3",
+    "srcName": "비바코정10mg",
+    "tgtNo": 137,
+    "tgtCode": "cres3",
+    "tgtName": "비바코정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 186,
+    "srcCode": "glmm3",
+    "srcName": "글라포민엠2/500mg",
+    "tgtNo": 43,
+    "tgtCode": "glmm3",
+    "tgtName": "글라포민엠2/500mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 190,
+    "srcCode": "at2",
+    "srcName": "파라마셋",
+    "tgtNo": 45,
+    "tgtCode": "at2",
+    "tgtName": "파라마셋",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 193,
+    "srcCode": "gaba1d",
+    "srcName": "가바펜틴캡슐 100mg",
+    "tgtNo": 128,
+    "tgtCode": "gaba1d",
+    "tgtName": "가바펜틴캡슐 100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 196,
+    "srcCode": "oxcb30",
+    "srcName": "옥사제핀정300mg",
+    "tgtNo": 37,
+    "tgtCode": "oxcb30",
+    "tgtName": "옥사제핀정300mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 197,
+    "srcCode": "cdr1",
+    "srcName": "독사존엑스엘서방정4mg",
+    "tgtNo": 52,
+    "tgtCode": "cdr1",
+    "tgtName": "독사존엑스엘서방정4mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 199,
+    "srcCode": "clpda",
+    "srcName": "플라빅스에이",
+    "tgtNo": 81,
+    "tgtCode": "clpda",
+    "tgtName": "플라빅스에이",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 200,
+    "srcCode": "amd0.5",
+    "srcName": "애니디핀에스정2.5mg",
+    "tgtNo": 114,
+    "tgtCode": "amd0.5",
+    "tgtName": "애니디핀에스정2.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 201,
+    "srcCode": "lpr3",
+    "srcName": "로파인캡슐",
+    "tgtNo": 134,
+    "tgtCode": "lpr3",
+    "tgtName": "로파인캡슐",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 202,
+    "srcCode": "xarel15",
+    "srcName": "리록스반정15mg",
+    "tgtNo": 23,
+    "tgtCode": "xarel15",
+    "tgtName": "리록스반정15mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 203,
+    "srcCode": "xarel20",
+    "srcName": "리록스반정20mg",
+    "tgtNo": 155,
+    "tgtCode": "xarel20",
+    "tgtName": "리록스반정20mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 205,
+    "srcCode": "mgo",
+    "srcName": "산화마그네슘정250mg",
+    "tgtNo": 76,
+    "tgtCode": "mgo",
+    "tgtName": "산화마그네슘정250mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 209,
+    "srcCode": "gaba3dc",
+    "srcName": "가바펜틴캡슐300mg",
+    "tgtNo": 294,
+    "tgtCode": "gaba3dc",
+    "tgtName": "가바펜틴캡슐300mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 210,
+    "srcCode": "risp0.5",
+    "srcName": "리페리돈정0.5mg",
+    "tgtNo": 142,
+    "tgtCode": "risp0.5",
+    "tgtName": "리페리돈정0.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 212,
+    "srcCode": "mpd2",
+    "srcName": "소메론정",
+    "tgtNo": 54,
+    "tgtCode": "mpd2",
+    "tgtName": "소메론정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 213,
+    "srcCode": "avlx3",
+    "srcName": "모록사신400mg",
+    "tgtNo": 13,
+    "tgtCode": "avlx3",
+    "tgtName": "모록사신400mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 214,
+    "srcCode": "kepra3",
+    "srcName": "레비라정500mg",
+    "tgtNo": 44,
+    "tgtCode": "kepra3",
+    "tgtName": "레비라정500mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 216,
+    "srcCode": "cele100",
+    "srcName": "쎄레브렉스캡슐100mg",
+    "tgtNo": 276,
+    "tgtCode": "cele100",
+    "tgtName": "쎄레브렉스캡슐100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 217,
+    "srcCode": "crez3",
+    "srcName": "듀오논정10/10mg",
+    "tgtNo": 147,
+    "tgtCode": "crez3",
+    "tgtName": "듀오논 정10/10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 219,
+    "srcCode": "rexa5",
+    "srcName": "렉사큐어정5mg",
+    "tgtNo": 250,
+    "tgtCode": "rexa5",
+    "tgtName": "렉사큐어정 5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 222,
+    "srcCode": "lixi6",
+    "srcName": "릭시아나60mg",
+    "tgtNo": 105,
+    "tgtCode": "lixi6",
+    "tgtName": "릭시아나60mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 225,
+    "srcCode": "lixi3",
+    "srcName": "릭시아나정30mg",
+    "tgtNo": 191,
+    "tgtCode": "lixi3",
+    "tgtName": "릭시아나정30mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 226,
+    "srcCode": "piva2",
+    "srcName": "리바로정2mg",
+    "tgtNo": 77,
+    "tgtCode": "piva2",
+    "tgtName": "리바로정2mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 227,
+    "srcCode": "clzcr",
+    "srcName": "실로스탄씨알정200mg",
+    "tgtNo": 104,
+    "tgtCode": "clzcr",
+    "tgtName": "실로스탄씨알정200mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 228,
+    "srcCode": "lipn8",
+    "srcName": "리피논정80mg",
+    "tgtNo": 61,
+    "tgtCode": "lipn8",
+    "tgtName": "리피논정80mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 230,
+    "srcCode": "betm1",
+    "srcName": "미라벡서방정50mg",
+    "tgtNo": 33,
+    "tgtCode": "betm1",
+    "tgtName": "미라벡서방정50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 231,
+    "srcCode": "doxy4",
+    "srcName": "독시사이클린정100mg",
+    "tgtNo": 64,
+    "tgtCode": "doxy4",
+    "tgtName": "독시사이클린정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 232,
+    "srcCode": "cres20",
+    "srcName": "크레스논정20mg",
+    "tgtNo": 172,
+    "tgtCode": "cres20",
+    "tgtName": "크레스논정20mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 234,
+    "srcCode": "gc6",
+    "srcName": "디아미크롱서방정60mg",
+    "tgtNo": 189,
+    "tgtCode": "gc6",
+    "tgtName": "디아미크롱서방정60mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 235,
+    "srcCode": "bis2.5",
+    "srcName": "콩코르정2.5mg",
+    "tgtNo": 48,
+    "tgtCode": "bis2.5",
+    "tgtName": "콩코르정2.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 236,
+    "srcCode": "cvd0.5",
+    "srcName": "바소트롤정12.5mg",
+    "tgtNo": 263,
+    "tgtCode": "cvd0.5",
+    "tgtName": "바소트롤정12.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 237,
+    "srcCode": "cald1",
+    "srcName": "칼디플러스",
+    "tgtNo": 7,
+    "tgtCode": "cald1",
+    "tgtName": "칼디플러스",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 238,
+    "srcCode": "lst1",
+    "srcName": "오잘탄정50mg",
+    "tgtNo": 136,
+    "tgtCode": "lst1",
+    "tgtName": "오잘탄정50mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 240,
+    "srcCode": "sacval2",
+    "srcName": "엔토레스토필름코팅정100mg",
+    "tgtNo": 177,
+    "tgtCode": "sacval2",
+    "tgtName": "엔토레스토필름코팅정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 241,
+    "srcCode": "sig",
+    "srcName": "시그마트정5mg",
+    "tgtNo": 120,
+    "tgtCode": "sig",
+    "tgtName": "시그마트정5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 242,
+    "srcCode": "gph10",
+    "srcName": "다이아벡스정1000mg",
+    "tgtNo": 20,
+    "tgtCode": "gph10",
+    "tgtName": "다이아벡스정1000mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 243,
+    "srcCode": "folic",
+    "srcName": "폴산정1mg",
+    "tgtNo": 268,
+    "tgtCode": "folic",
+    "tgtName": "폴산정1mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 244,
+    "srcCode": "srda1",
+    "srcName": "솝튼정",
+    "tgtNo": 96,
+    "tgtCode": "srda1",
+    "tgtName": "솝튼정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 245,
+    "srcCode": "dio80",
+    "srcName": "디오살탄정80mg",
+    "tgtNo": 221,
+    "tgtCode": "dio80",
+    "tgtName": "디오살탄정80mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 248,
+    "srcCode": "brimt",
+    "srcName": "브린텔릭스정10mg",
+    "tgtNo": 119,
+    "tgtCode": "brimt",
+    "tgtName": "브린텔릭스정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 249,
+    "srcCode": "dio40",
+    "srcName": "디오살탄정40mg",
+    "tgtNo": 22,
+    "tgtCode": "dio40",
+    "tgtName": "디오살탄정40mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 252,
+    "srcCode": "ata2",
+    "srcName": "칸데모어정16mg",
+    "tgtNo": 179,
+    "tgtCode": "ata2",
+    "tgtName": "칸데모어정16mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 255,
+    "srcCode": "ppv0.5",
+    "srcName": "비유피-4정10mg",
+    "tgtNo": 168,
+    "tgtCode": "ppv0.5",
+    "tgtName": "비유피-4정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 256,
+    "srcCode": "lofx2",
+    "srcName": "레복사신정100mg",
+    "tgtNo": 185,
+    "tgtCode": "lofx2",
+    "tgtName": "레복사신정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 257,
+    "srcCode": "foxig1",
+    "srcName": "다파엔정10mg",
+    "tgtNo": 226,
+    "tgtCode": "foxig1",
+    "tgtName": "다파엔정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 262,
+    "srcCode": "nb",
+    "srcName": "타스나정500mg",
+    "tgtNo": 117,
+    "tgtCode": "nb",
+    "tgtName": "타스나정500mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 265,
+    "srcCode": "van",
+    "srcName": "반코진캡슐125mg",
+    "tgtNo": 121,
+    "tgtCode": "van",
+    "tgtName": "반코진캡슐125mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 266,
+    "srcCode": "isod1",
+    "srcName": "엘탄서방정60mg",
+    "tgtNo": 25,
+    "tgtCode": "isod1",
+    "tgtName": "엘탄 서방정 60mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 267,
+    "srcCode": "lipoz2",
+    "srcName": "제피토정10/10mg",
+    "tgtNo": 39,
+    "tgtCode": "lipoz2",
+    "tgtName": "제피토정10/10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 268,
+    "srcCode": "ent",
+    "srcName": "엔테론정150mg",
+    "tgtNo": 215,
+    "tgtCode": "ent",
+    "tgtName": "엔테론정150mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 269,
+    "srcCode": "xatral",
+    "srcName": "자트랄엑스엘정10mg",
+    "tgtNo": 108,
+    "tgtCode": "xatral",
+    "tgtName": "자트랄엑스엘정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 272,
+    "srcCode": "multac",
+    "srcName": "멀택정",
+    "tgtNo": 145,
+    "tgtCode": "multac",
+    "tgtName": "멀택정",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 273,
+    "srcCode": "ppv",
+    "srcName": "비유피-4정20mg",
+    "tgtNo": 216,
+    "tgtCode": "ppv",
+    "tgtName": "비유피-4정20mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 274,
+    "srcCode": "lixi15",
+    "srcName": "릭시아나정15mg",
+    "tgtNo": 228,
+    "tgtCode": "lixi15",
+    "tgtName": "릭시아나정15mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 276,
+    "srcCode": "anorrx",
+    "srcName": "아노렉스캡슐25mg",
+    "tgtNo": 163,
+    "tgtCode": "anorrx",
+    "tgtName": "아노렉스캡슐25mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 279,
+    "srcCode": "nife3",
+    "srcName": "아다핀오스서방정30mg",
+    "tgtNo": 82,
+    "tgtCode": "nife3",
+    "tgtName": "아다핀오스서방정30mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 280,
+    "srcCode": "ascta",
+    "srcName": "대원아미노필린정100mg",
+    "tgtNo": 124,
+    "tgtCode": "ascta",
+    "tgtName": "대원아미노필린정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 282,
+    "srcCode": "valp15",
+    "srcName": "오르필서방정150mg",
+    "tgtNo": 107,
+    "tgtCode": "valp15",
+    "tgtName": "오르필서방정150mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 283,
+    "srcCode": "lacosa1",
+    "srcName": "빔스크정100mg",
+    "tgtNo": 207,
+    "tgtCode": "lacosa1",
+    "tgtName": "빔스크정100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 289,
+    "srcCode": "nebi1",
+    "srcName": "네비레트 엠 정 2.5mg",
+    "tgtNo": 102,
+    "tgtCode": "nebi1",
+    "tgtName": "네비레트 엠 정 2.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 293,
+    "srcCode": "bf1",
+    "srcName": "부루펜정200mg",
+    "tgtNo": 141,
+    "tgtCode": "bf1",
+    "tgtName": "부루펜정200mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 294,
+    "srcCode": "ibstp1",
+    "srcName": "아벨탄플러스정150/12.5mg",
+    "tgtNo": 92,
+    "tgtCode": "ibstp1",
+    "tgtName": "아벨탄플러스정 150/12.5mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 296,
+    "srcCode": "famcv1",
+    "srcName": "팜시버정250mg",
+    "tgtNo": 201,
+    "tgtCode": "famcv1",
+    "tgtName": "팜시버 정 250mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 298,
+    "srcCode": "duxe1",
+    "srcName": "듀로셉톨캡슐30mg",
+    "tgtNo": 98,
+    "tgtCode": "duxe1",
+    "tgtName": "듀로셉톨캡슐30mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 299,
+    "srcCode": "acl1",
+    "srcName": "에어탈정100mg",
+    "tgtNo": 190,
+    "tgtCode": "acl1",
+    "tgtName": "에어탈정 100mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 301,
+    "srcCode": "glia1",
+    "srcName": "글리아타민연질캡슐",
+    "tgtNo": 182,
+    "tgtCode": "glia1",
+    "tgtName": "글리아타민연질캡슐",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 302,
+    "srcCode": "tst1",
+    "srcName": "트레스오릭스포르테캡슐",
+    "tgtNo": 32,
+    "tgtCode": "tst1",
+    "tgtName": "트레스 오릭스 포르테 캡슐",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 303,
+    "srcCode": "lipi2",
+    "srcName": "리피논정20mg",
+    "tgtNo": 171,
+    "tgtCode": "lipi2",
+    "tgtName": "리피논정 20mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 306,
+    "srcCode": "lipi1",
+    "srcName": "리피논정10mg",
+    "tgtNo": 27,
+    "tgtCode": "lipi1",
+    "tgtName": "리피논 정10mg",
+    "status": "EXACT"
+  },
+  {
+    "srcNo": 308,
+    "srcCode": "abx1",
+    "srcName": "암브렉트정30mg",
+    "tgtNo": 94,
+    "tgtCode": "abx1",
+    "tgtName": "암브렉트 정 30mg",
+    "status": "EXACT"
+  }
+]
