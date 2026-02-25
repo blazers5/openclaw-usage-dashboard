@@ -1,0 +1,25 @@
+{
+  "updatedAt": "2026-02-25T18:12:00+09:00",
+  "system": {
+    "timeZone": "Asia/Seoul",
+    "model": "openai-codex/gpt-5.3-codex",
+    "session": "agent:main:main",
+    "context": "215k/272k (79%)",
+    "tokens": "213k in / 49 out",
+    "usage5h": "97% left",
+    "usageDay": "99% left"
+  },
+  "projects": [
+    "약품관리 페이지 운영/출력 규격 유지",
+    "jp-kaiwa-web MVP 개발 진행 중",
+    "카메라/ASUS ET9 정시 재고 모니터링 운영"
+  ],
+  "roles": [
+    {"name":"민대리","id":"agent:main:main","role":"메인 총괄"},
+    {"name":"veteran-planner","role":"기획 리드"},
+    {"name":"elite-researcher","role":"리서치 리드"},
+    {"name":"world-class-dev","role":"기술 리드"},
+    {"name":"world-class-designer","role":"UX/UI 리드"},
+    {"name":"jp-kaiwa-fastlane","role":"고속 구현 전담"}
+  ]
+}
